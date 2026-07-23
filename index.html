@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz 1 in C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#2b6cb0;
+    --primary-dark:#1a4971;
+    --accent:#0ea5a4;
+    --bg:#eef2f9;
+    --card:#ffffff;
+    --correct:#2f9e44;
+    --wrong:#e03131;
+    --border:#dbe3ee;
+    --text:#1f2937;
+    --muted:#64748b;
+    --pdf:#e8590c;
+    --pdf-dark:#c94a08;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:auto;}
+  body{
+    margin:0;
+    font-family:'Tajawal','Segoe UI', Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:20px;
+  }
+  .container{
+    max-width:800px;
+    margin:0 auto;
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;
+    padding:24px 28px;
+    border-radius:16px;
+    margin-bottom:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    box-shadow:0 6px 18px rgba(43,108,176,0.25);
+  }
+  .header h1{margin:0;font-size:1.4rem;font-weight:700;}
+  .header p{margin:6px 0 0;font-size:0.88rem;opacity:0.95;}
+  #timer{
+    background:rgba(255,255,255,0.2);
+    padding:10px 20px;
+    border-radius:12px;
+    font-size:1.4rem;
+    font-weight:900;
+    min-width:110px;
+    text-align:center;
+    letter-spacing:1px;
+  }
+  #timer.warn{background:#e03131;}
+  .progress-wrap{
+    background:#d7e0ee;
+    border-radius:8px;
+    height:10px;
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  #progress-bar{
+    height:100%;
+    background:linear-gradient(90deg,var(--primary),var(--accent));
+    width:0%;
+    transition:width 0.3s;
+  }
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:22px;
+    margin-bottom:16px;
+    box-shadow:0 3px 12px rgba(30,41,59,0.07);
+    border:1px solid var(--border);
+  }
+  .q-number{
+    display:inline-block;
+    background:var(--primary);
+    color:#fff;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    text-align:center;
+    line-height:32px;
+    font-size:0.9rem;
+    font-weight:700;
+    margin-left:10px;
+  }
+  .q-text{
+    font-size:1.06rem;
+    font-weight:700;
+    margin:10px 0 16px;
+    line-height:1.7;
+}
+  .q-code{
+    background:#0f172a;
+    color:#e2e8f0;
+    padding:14px 16px;
+    border-radius:10px;
+    font-family:'Consolas','Courier New',monospace;
+    direction:ltr;
+    text-align:left;
+    margin:10px 0 16px;
+    white-space:pre;
+    overflow-x:auto;
+    font-size:0.9rem;
+    line-height:1.5;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 15px;
+    border:2px solid var(--border);
+    border-radius:12px;
+    cursor:pointer;
+    transition:all 0.15s;
+    font-size:0.98rem;
+  }
+  .option:hover{border-color:var(--primary);background:#f0f6ff;}
+  .option.selected{
+    border-color:var(--primary);
+    background:#e7f1ff;
+    font-weight:700;
+  }
+  .option input{accent-color:var(--primary);}
+  .footer-bar{
+    position:sticky;
+    bottom:0;
+    background:var(--bg);
+    padding:14px 0;
+    text-align:center;
+  }
+  button{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:14px 40px;
+    font-size:1.05rem;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    transition:all 0.15s;
+    font-family:inherit;
+  }
+  button:hover{background:var(--primary-dark);transform:translateY(-1px);}
+  button:disabled{background:#94a3b8;cursor:not-allowed;}
+  #results{
+    display:none;
+  }
+  .score-card{
+    text-align:center;
+    background:var(--card);
+    border-radius:16px;
+    padding:32px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(30,41,59,0.07);
+  }
+  .score-num{
+    font-size:3.2rem;
+    font-weight:900;
+    color:var(--primary);
+  }
+  .score-msg{
+    font-size:1.1rem;
+    color:var(--muted);
+    margin-top:8px;
+    font-weight:500;
+  }
+  .review-item{
+    border-right:5px solid var(--correct);
+  }
+  .review-item.wrong{
+    border-right:5px solid var(--wrong);
+  }
+  .answer-line{
+    padding:11px 14px;
+    border-radius:10px;
+    margin-top:6px;
+    font-size:0.95rem;
+  }
+  .answer-line.correct{background:#ebfbee;color:var(--correct);font-weight:700;}
+  .answer-line.wrong{background:#fff5f5;color:var(--wrong);font-weight:700;}
+  #not-answered-warning{
+    color:var(--wrong);
+    text-align:center;
+    margin-bottom:10px;
+    font-size:0.9rem;
+    display:none;
+    font-weight:700;
+  }
+  .unanswered{border-color:#f59f00 !important;}
+
+  /* Start screen */
+  #start-screen{
+    background:var(--card);
+    border-radius:16px;
+    padding:36px 30px;
+    text-align:center;
+    box-shadow:0 3px 14px rgba(30,41,59,0.08);
+  }
+  #start-screen h2{margin-top:0;font-size:1.3rem;}
+  #start-screen p{color:var(--muted);}
+  #start-screen input{
+    width:100%;
+    max-width:320px;
+    padding:15px 16px;
+    font-size:1.05rem;
+    border:2px solid var(--border);
+    border-radius:12px;
+    margin:16px 0;
+    text-align:center;
+    font-family:inherit;
+  }
+  #start-screen input:focus{outline:none;border-color:var(--primary);}
+  #name-warning{
+    color:var(--wrong);
+    font-size:0.9rem;
+    display:none;
+    margin-bottom:10px;
+    font-weight:700;
+  }
+  .action-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .pdf-btn{ background:var(--pdf); }
+  .pdf-btn:hover{ background:var(--pdf-dark); }
+  #send-instructions{
+    margin-top:16px;
+    text-align:right;
+    background:#fff8e1;
+    border:1px solid #f5c518;
+    border-radius:12px;
+    padding:16px 18px;
+    font-size:0.9rem;
+    color:#5a4a00;
+    line-height:1.8;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div id="timer">15:00</div>
+    <div>
+      <h1 style="direction:ltr; unicode-bidi:isolate;">Quiz 1 in C++</h1>
+      <p style="margin-top:2px; font-weight:500;">إعداد: Eng.Marco Edwer</p>
+    </div>
+  </div>
+
+  <div id="start-screen">
+    <h2>بيانات الطالب</h2>
+    <p>يرجى كتابة الاسم قبل بدء الامتحان</p>
+    <div id="name-warning">يرجى كتابة الاسم أولاً</div>
+    <input type="text" id="student-name" placeholder="الاسم">
+    <br>
+    <button id="start-btn">ابدأ الامتحان</button>
+  </div>
+
+  <div class="progress-wrap" style="display:none;"><div id="progress-bar"></div></div>
+
+  <div id="quiz-area"></div>
+
+  <div id="not-answered-warning">يرجى الإجابة عن جميع الأسئلة قبل التسليم</div>
+
+  <div class="footer-bar" style="display:none;">
+    <button id="submit-btn">تسليم الامتحان</button>
+  </div>
+
+  <div id="results">
+    <div id="report-content">
+      <div id="print-meta" class="score-card" style="padding:24px;">
+        <div id="score-emoji" style="font-size:3rem; line-height:1; margin-bottom:6px;"></div>
+        <div class="score-num" id="score-num">0 / 20</div>
+        <div class="score-msg" id="score-msg"></div>
+        <div class="action-buttons">
+          <a class="pdf-btn" id="send-wa-btn" href="#" target="_blank" style="background:#25D366; text-decoration:none;">📱 إرسال التقرير على واتساب</a>
+        </div>
+      </div>
+      <div id="review-area"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.scrollTo(0,0);
+
+const TEACHER_PHONE = "201275166855"; // رقم واتساب المستر
+
+const questions = [
+  {
+    q: "ما اسم الملف الرأسي (Header File) الذي يجب تضمينه في بداية البرنامج لاستخدام الأمرين cin و cout؟",
+    options: ["conio.h", "iostream", "stdio.h", "math.h"],
+    correct: 1
+  },
+  {
+    q: "من أي دالة (Function) يبدأ تنفيذ أي برنامج مكتوب بلغة ++C؟",
+    options: ["start()", "run()", "main()", "begin()"],
+    correct: 2
+  },
+  {
+    q: "ما الصيغة الصحيحة لكتابة تعليق (Comment) في سطر واحد داخل الشيفرة البرمجية؟",
+    options: ["# ملاحظة", "// ملاحظة", "<!-- ملاحظة -->", "** ملاحظة **"],
+    correct: 1
+  },
+  {
+    q: "ما الناتج المتوقع عند تنفيذ السطر البرمجي التالي؟",
+    code: "cout << \"Ahlan\";",
+    options: ["ظهور كلمة Ahlan", "رسالة خطأ", "بقاء الشاشة فارغة", "ظهور الرقم 0"],
+    correct: 0
+  },
+  {
+    q: "أي أمر يُستخدم لإدخال قيمة من المستخدم عبر لوحة المفاتيح وتخزينها في متغير؟",
+    options: ["cout", "read", "cin", "get"],
+    correct: 2
+  },
+  {
+    q: "أي نوع بيانات هو الأنسب لتخزين عدد صحيح مثل عمر شخص (15 سنة)؟",
+    options: ["int", "char", "float", "bool"],
+    correct: 0
+  },
+  {
+    q: "أي نوع بيانات هو الأنسب لتخزين قيمة عشرية مثل سعر منتج (25.75)؟",
+    options: ["int", "char", "float", "bool"],
+    correct: 2
+  },
+  {
+    q: "ما الخطأ الموجود في السطر البرمجي التالي؟",
+    code: "cout << \"Hello World\"",
+    options: [
+      "عدم وجود فاصلة منقوطة ; في نهاية السطر",
+      "خطأ في كتابة الكلمة Hello",
+      "يجب استخدام cin بدلًا من cout",
+      "لا يوجد أي خطأ"
+    ],
+    correct: 0
+  },
+  {
+    q: "ما الخطأ الموجود في الشيفرة البرمجية التالية؟",
+    code: "int y = 5;\nif(y = 10)\n{\n    cout << \"القيمة عشرة\";\n}",
+    options: [
+      "تم استخدام = بدلًا من == لإجراء المقارنة",
+      "نسيان الفاصلة المنقوطة ;",
+      "خطأ في اسم المتغير y",
+      "لا يوجد أي خطأ"
+    ],
+    correct: 0
+  },
+  {
+    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
+    code: "int x = 10;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
+    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
+    correct: 0
+  },
+  {
+    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
+    code: "int x = 3;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
+    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
+    correct: 1
+  },
+  {
+    q: "متى يتم تنفيذ الجزء الخاص بـ else في جملة الشرط if-else؟",
+    options: [
+      "عندما يكون الشرط صحيحًا دائمًا",
+      "عندما يكون الشرط غير محقق (false)",
+      "لا يتم تنفيذه أبدًا",
+      "قبل التحقق من الشرط"
+    ],
+    correct: 1
+  },
+  {
+    q: "ما الغرض من استخدام جملة switch في البرمجة؟",
+    options: [
+      "تكرار تنفيذ جزء من الشيفرة عدة مرات",
+      "الاختيار بين عدة احتمالات لقيمة متغير واحد بدلًا من استخدام عدة جمل if",
+      "إدخال البيانات من المستخدم",
+      "تعريف دالة جديدة"
+    ],
+    correct: 1
+  },
+  {
+    q: "ماذا يحدث إذا تم إغفال كتابة break بعد إحدى حالات (case) جملة switch؟",
+    options: [
+      "يتوقف البرنامج عن العمل فورًا",
+      "يستمر التنفيذ تلقائيًا في الحالة (case) التالية",
+      "يتم تجاهل جميع الحالات التالية",
+      "لا يحدث أي تأثير"
+    ],
+    correct: 1
+  },
+  {
+    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
+    code: "int x = 2;\nswitch(x)\n{\n    case 1: cout << \"واحد\"; break;\n    case 2: cout << \"اثنان\"; break;\n    default: cout << \"غير ذلك\";\n}",
+    options: ["واحد", "اثنان", "غير ذلك", "لا يظهر شيء"],
+    correct: 1
+  },
+  {
+    q: "ما المقصود بالعامل المنطقي && (AND)؟",
+    options: [
+      "يجب أن يتحقق الشرطان معًا حتى تكون النتيجة صحيحة",
+      "يكفي تحقق أحد الشرطين فقط",
+      "يقوم بعكس نتيجة الشرط",
+      "يُستخدم لمقارنة القيم النصية"
+    ],
+    correct: 0
+  },
+  {
+    q: "ما المقصود بالعامل المنطقي || (OR)؟",
+    options: [
+      "يجب أن يتحقق الشرطان معًا",
+      "يكفي تحقق أحد الشرطين فقط لتكون النتيجة صحيحة",
+      "يعكس نتيجة الشرط",
+      "لا يُستخدم داخل جملة if"
+    ],
+    correct: 1
+  },
+  {
+    q: "ما المقصود بمصطلح الشرط المتداخل (Nested if)؟",
+    options: [
+      "وضع جملة if كاملة داخل جملة if أخرى",
+      "استخدام أكثر من متغير في السطر نفسه",
+      "تكرار تنفيذ الشيفرة عدة مرات",
+      "دالة تستدعي نفسها"
+    ],
+    correct: 0
+  },
+  {
+    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
+    code: "int age = 65;\nif(age >= 18)\n{\n    if(age < 65)\n    {\n        cout << \"بالغ\";\n    }\n    else\n    {\n        cout << \"كبير السن\";\n    }\n}\nelse\n{\n    cout << \"طفل\";\n}",
+    options: ["بالغ", "كبير السن", "طفل", "لا يظهر شيء"],
+    correct: 1
+  },
+  {
+    q: "أي رمز من الرموز التالية يُستخدم للتعبير عن عدم التساوي (Not Equal) بين قيمتين؟",
+    options: ["==", "=", "!=", "<>"],
+    correct: 2
+  }
+];
+
+const TOTAL_TIME = 15 * 60; // 15 minutes in seconds
+let timeLeft = TOTAL_TIME;
+let timerInterval;
+let userAnswers = new Array(questions.length).fill(null);
+let submitted = false;
+let studentName = "";
+
+function renderQuiz(){
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + idx;
+
+    let codeHtml = '';
+    if(item.code){
+      codeHtml = `<div class="q-code">${item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    }
+
+    let optionsHtml = '';
+    item.options.forEach((opt, oIdx) => {
+      optionsHtml += `
+        <label class="option" data-q="${idx}" data-o="${oIdx}">
+          <input type="radio" name="q${idx}" value="${oIdx}">
+          <span>${opt}</span>
+        </label>`;
+    });
+
+    card.innerHTML = `
+      <div><span class="q-number">${idx+1}</span></div>
+      <div class="q-text">${item.q}</div>
+      ${codeHtml}
+      <div class="options">${optionsHtml}</div>
+    `;
+    area.appendChild(card);
+  });
+
+  document.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qIdx = parseInt(this.dataset.q);
+      const oIdx = parseInt(this.dataset.o);
+      userAnswers[qIdx] = oIdx;
+      const card = document.getElementById('card-'+qIdx);
+      card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      card.classList.remove('unanswered');
+      this.querySelector('input').checked = true;
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress(){
+  const answered = userAnswers.filter(a => a !== null).length;
+  const pct = (answered / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx){
+    try{
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }catch(e){}
+  }
+}
+function playTick(freq, duration){
+  if(!audioCtx) return;
+  try{
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }catch(e){}
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = (sec%60).toString().padStart(2,'0');
+  return m + ':' + s;
+}
+
+function startTimer(){
+  const timerEl = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = formatTime(timeLeft);
+    if(timeLeft <= 60 && timeLeft > 0){
+      timerEl.classList.add('warn');
+      const freq = 500 + (60 - timeLeft) * 10;
+      playTick(freq, timeLeft <= 10 ? 0.18 : 0.1);
+    }
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      finishExam(true);
+    }
+  }, 1000);
+}
+
+let finalScore = 0;
+let finalTotal = questions.length;
+let finalPct = 0;
+let wrongQuestionNumbers = [];
+
+function finishExam(autoSubmit){
+  if(submitted) return;
+
+  if(!autoSubmit){
+    const unanswered = userAnswers.some(a => a === null);
+    if(unanswered){
+      document.getElementById('not-answered-warning').style.display = 'block';
+      userAnswers.forEach((a, idx) => {
+        if(a === null){
+          document.getElementById('card-'+idx).classList.add('unanswered');
+        }
+      });
+      return;
+    }
+  }
+
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('not-answered-warning').style.display = 'none';
+
+  let score = 0;
+  wrongQuestionNumbers = [];
+  const reviewArea = document.getElementById('review-area');
+  reviewArea.innerHTML = '';
+
+  questions.forEach((item, idx) => {
+    const userA = userAnswers[idx];
+    const isCorrect = userA === item.correct;
+    if(isCorrect){ score++; } else { wrongQuestionNumbers.push(idx+1); }
+
+    const div = document.createElement('div');
+    div.className = 'card review-item' + (isCorrect ? '' : ' wrong');
+
+    let codeHtml = '';
+    if(item.code){
+      codeHtml = `<div class="q-code">${item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    }
+
+    let userAnswerText = userA === null ? 'لم تتم الإجابة' : item.options[userA];
+    let answerHtml = '';
+    if(isCorrect){
+      answerHtml = `<div class="answer-line correct">الإجابة: ${userAnswerText} ✓ إجابة صحيحة</div>`;
+    } else {
+      answerHtml = `
+        <div class="answer-line wrong">إجابة الطالب: ${userAnswerText} ✗</div>
+        <div class="answer-line correct">الإجابة الصحيحة: ${item.options[item.correct]}</div>
+      `;
+    }
+
+    div.innerHTML = `
+      <div><span class="q-number">${idx+1}</span></div>
+      <div class="q-text">${item.q}</div>
+      ${codeHtml}
+      ${answerHtml}
+    `;
+    reviewArea.appendChild(div);
+  });
+
+  finalScore = score;
+  finalTotal = questions.length;
+  finalPct = Math.round((score/finalTotal)*100);
+
+  document.getElementById('score-num').textContent = finalScore + ' / ' + finalTotal;
+  let msg = '';
+  let bigEmoji = '';
+  if(finalPct >= 90){ msg = 'ممتاز! أداء رائع'; bigEmoji = '🏆'; }
+  else if(finalPct >= 75){ msg = 'جيد جدًا، استمر في المذاكرة'; bigEmoji = '😄'; }
+  else if(finalPct >= 50){ msg = 'جيد، يحتاج إلى مزيد من المراجعة'; bigEmoji = '🙂'; }
+  else { msg = 'يُنصح بمراجعة الدروس من البداية'; bigEmoji = '😕'; }
+
+  document.getElementById('score-emoji').textContent = bigEmoji;
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('ar-EG');
+  document.getElementById('score-msg').innerHTML =
+    `الاسم: <strong>${studentName}</strong><br>التاريخ: ${dateStr}<br>نسبة النجاح: ${finalPct}% — ${msg}`;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.querySelector('.footer-bar').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+document.getElementById('send-wa-btn').addEventListener('click', function(e){
+  e.preventDefault();
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('ar-EG');
+  const divider = '━━━━━━━━━━━━━━';
+
+  let lines = [];
+  lines.push('📊 *تقرير Quiz 1 in C++*');
+  lines.push(divider);
+  lines.push(`👤 *الاسم:* ${studentName}`);
+  lines.push(`📅 *التاريخ:* ${dateStr}`);
+  lines.push(`🎯 *الدرجة:* ${finalScore} / ${finalTotal}  (${finalPct}%)`);
+
+  if(wrongQuestionNumbers.length){
+    lines.push(`❌ *الأسئلة الخاطئة:* ${wrongQuestionNumbers.join('، ')}`);
+  } else {
+    lines.push('✅ *لا توجد أخطاء — إجابات كاملة وصحيحة*');
+  }
+  lines.push(divider);
+  lines.push('📝 *تفاصيل الإجابات:*');
+
+  questions.forEach((item, idx) => {
+    const userA = userAnswers[idx];
+    const isCorrect = userA === item.correct;
+    const userAnswerText = userA === null ? 'لم تتم الإجابة' : item.options[userA];
+
+    let block = `*السؤال ${idx+1}:* ${item.q}`;
+    if(item.code){
+      block += `\n\`\`\`${item.code}\`\`\``;
+    }
+    if(isCorrect){
+      block += `\n✅ إجابة الطالب: ${userAnswerText}  (صحيحة)`;
+    } else {
+      block += `\n❌ إجابة الطالب: ${userAnswerText}`;
+      block += `\n✔️ الإجابة الصحيحة: ${item.options[item.correct]}`;
+    }
+    lines.push(block);
+    lines.push('▫️▫️▫️');
+  });
+
+  const fullReport = lines.join('\n\n');
+  const waUrl = `https://wa.me/${TEACHER_PHONE}?text=${encodeURIComponent(fullReport)}`;
+  window.open(waUrl, '_blank');
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  const nameInput = document.getElementById('student-name');
+  const name = nameInput.value.trim();
+  if(name === ''){
+    document.getElementById('name-warning').style.display = 'block';
+    nameInput.focus();
+    return;
+  }
+  studentName = name;
+  initAudio();
+  document.getElementById('start-screen').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'block';
+  document.querySelector('.footer-bar').style.display = 'block';
+  renderQuiz();
+  startTimer();
+  window.scrollTo({top:0, behavior:'auto'});
+});
+
+document.getElementById('submit-btn').addEventListener('click', () => finishExam(false));
+</script>
+
+</body>
+</html>
