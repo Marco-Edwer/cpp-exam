@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتحان C++ - حتى التحكم في التدفق</title>
+<style>
+  :root{
+    --primary:#2b6cb0;
+    --primary-dark:#1a4971;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --correct:#2f9e44;
+    --wrong:#e03131;
+    --border:#dbe3ee;
+    --text:#1f2937;
+    --muted:#64748b;
+    --wa:#25D366;
+    --wa-dark:#1ebe5b;
+    --pdf:#e8590c;
+    --pdf-dark:#c94a08;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:20px;
+  }
+  .container{
+    max-width:800px;
+    margin:0 auto;
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:#fff;
+    padding:22px 26px;
+    border-radius:14px;
+    margin-bottom:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .header h1{margin:0;font-size:1.3rem;}
+  .header p{margin:4px 0 0;font-size:0.85rem;opacity:0.9;}
+  #timer{
+    background:rgba(255,255,255,0.18);
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:1.3rem;
+    font-weight:bold;
+    min-width:100px;
+    text-align:center;
+  }
+  #timer.warn{background:#e03131;}
+  .progress-wrap{
+    background:#dbe3ee;
+    border-radius:8px;
+    height:10px;
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  #progress-bar{
+    height:100%;
+    background:var(--primary);
+    width:0%;
+    transition:width 0.3s;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    border:1px solid var(--border);
+  }
+  .q-number{
+    display:inline-block;
+    background:var(--primary);
+    color:#fff;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    text-align:center;
+    line-height:30px;
+    font-size:0.85rem;
+    margin-left:10px;
+  }
+  .q-text{
+    font-size:1.05rem;
+    font-weight:600;
+    margin:10px 0 16px;
+    line-height:1.6;
+}
+  .q-code{
+    background:#0f172a;
+    color:#e2e8f0;
+    padding:12px 16px;
+    border-radius:8px;
+    font-family:'Consolas','Courier New',monospace;
+    direction:ltr;
+    text-align:left;
+    margin:10px 0 16px;
+    white-space:pre;
+    overflow-x:auto;
+    font-size:0.9rem;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px;
+    border:2px solid var(--border);
+    border-radius:10px;
+    cursor:pointer;
+    transition:all 0.15s;
+    font-size:0.98rem;
+  }
+  .option:hover{border-color:var(--primary);background:#f0f6ff;}
+  .option.selected{
+    border-color:var(--primary);
+    background:#e7f1ff;
+    font-weight:600;
+  }
+  .option input{accent-color:var(--primary);}
+  .footer-bar{
+    position:sticky;
+    bottom:0;
+    background:var(--bg);
+    padding:14px 0;
+    text-align:center;
+  }
+  button{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:14px 40px;
+    font-size:1.05rem;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:background 0.15s;
+  }
+  button:hover{background:var(--primary-dark);}
+  button:disabled{background:#94a3b8;cursor:not-allowed;}
+  #results{
+    display:none;
+  }
+  .score-card{
+    text-align:center;
+    background:var(--card);
+    border-radius:14px;
+    padding:30px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .score-num{
+    font-size:3rem;
+    font-weight:bold;
+    color:var(--primary);
+  }
+  .score-msg{
+    font-size:1.1rem;
+    color:var(--muted);
+    margin-top:6px;
+  }
+  .review-item{
+    border-right:5px solid var(--correct);
+  }
+  .review-item.wrong{
+    border-right:5px solid var(--wrong);
+  }
+  .answer-line{
+    padding:10px 12px;
+    border-radius:8px;
+    margin-top:6px;
+    font-size:0.95rem;
+  }
+  .answer-line.correct{background:#ebfbee;color:var(--correct);font-weight:600;}
+  .answer-line.wrong{background:#fff5f5;color:var(--wrong);font-weight:600;}
+  #not-answered-warning{
+    color:var(--wrong);
+    text-align:center;
+    margin-bottom:10px;
+    font-size:0.9rem;
+    display:none;
+  }
+  .unanswered{border-color:#f59f00 !important;}
+
+  /* Start screen */
+  #start-screen{
+    background:var(--card);
+    border-radius:14px;
+    padding:30px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  #start-screen h2{margin-top:0;}
+  #start-screen input{
+    width:100%;
+    max-width:320px;
+    padding:14px 16px;
+    font-size:1.05rem;
+    border:2px solid var(--border);
+    border-radius:10px;
+    margin:16px 0;
+    text-align:center;
+  }
+  #start-screen input:focus{outline:none;border-color:var(--primary);}
+  #name-warning{
+    color:var(--wrong);
+    font-size:0.9rem;
+    display:none;
+    margin-bottom:10px;
+  }
+  .action-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+  .wa-btn{ background:var(--wa); }
+  .wa-btn:hover{ background:var(--wa-dark); }
+  .pdf-btn{ background:var(--pdf); }
+  .pdf-btn:hover{ background:var(--pdf-dark); }
+  .instructor-note{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.85rem;
+    margin-top:24px;
+  }
+  #print-meta{ display:none; }
+
+  @media print{
+    body *{ visibility:hidden; }
+    #results, #results *{ visibility:visible; }
+    #results{ position:absolute; left:0; top:0; width:100%; }
+    .action-buttons{ display:none !important; }
+    #print-meta{
+      display:block !important;
+      text-align:center;
+      margin-bottom:14px;
+      font-size:0.85rem;
+      color:#555;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1>امتحان لغة ++C</h1>
+      <p>حتى التحكم في التدفق (Control Flow: if / else / switch) — 20 سؤال اختيار من متعدد</p>
+    </div>
+    <div id="timer">15:00</div>
+  </div>
+
+  <div id="start-screen">
+    <h2>قبل ما تبدأ 👋</h2>
+    <p>اكتب اسمك الأول عشان يظهر مع نتيجتك</p>
+    <div id="name-warning">من فضلك اكتب اسمك الأول أولاً</div>
+    <input type="text" id="student-name" placeholder="اسمك الأول هنا...">
+    <br>
+    <button id="start-btn">ابدأ الامتحان</button>
+  </div>
+
+  <div class="progress-wrap" style="display:none;"><div id="progress-bar"></div></div>
+
+  <div id="quiz-area"></div>
+
+  <div id="not-answered-warning">من فضلك أجب عن جميع الأسئلة قبل التسليم (يمكنك التمرير لأعلى لمراجعتها)</div>
+
+  <div class="footer-bar" style="display:none;">
+    <button id="submit-btn">تسليم الامتحان</button>
+  </div>
+
+  <div id="results">
+    <div id="print-meta"></div>
+    <div class="score-card">
+      <div class="score-num" id="score-num">0 / 20</div>
+      <div class="score-msg" id="score-msg"></div>
+      <div class="action-buttons">
+        <button class="pdf-btn" id="send-all-btn">📄📱 إرسال التقرير كامل لـ Eng. Marco</button>
+      </div>
+      <div id="send-instructions" style="display:none; margin-top:14px; text-align:right; background:#fff8e1; border:1px solid #f5c518; border-radius:10px; padding:14px 16px; font-size:0.9rem; color:#5a4a00;">
+        <strong>خطوتين بسيطين:</strong><br>
+        1️⃣ دلوقتي هتفتح نافذة الطباعة — اختر <strong>"Save as PDF"</strong> واحفظ الملف على موبايلك.<br>
+        2️⃣ لما تقفل نافذة الطباعة، هيفتح واتساب معاك على المستر ماركو ومعاه رسالة جاهزة — بس لازم <strong>ترفق ملف الـ PDF اللي حفظته</strong> يدويًا في نفس المحادثة قبل الإرسال (واتساب مش بيسمح بإرفاق الملفات تلقائيًا من المتصفح لأسباب أمان).
+      </div>
+    </div>
+    <div id="review-area"></div>
+  </div>
+
+  <div class="instructor-note">إعداد: Eng. Marco Edwer</div>
+
+</div>
+
+<script>
+const TEACHER_PHONE = "201275166855"; // رقم واتساب المستر
+
+const questions = [
+  {
+    q: "ما هو الملف الرأسي (header file) الذي لازم نكتبه فوق البرنامج عشان نقدر نستخدم cin و cout؟",
+    options: ["conio.h", "iostream", "stdio.h", "math.h"],
+    correct: 1
+  },
+  {
+    q: "أي برنامج C++ لازم يبدأ التنفيذ من داخل دالة اسمها إيه؟",
+    options: ["start()", "run()", "main()", "begin()"],
+    correct: 2
+  },
+  {
+    q: "عايز تكتب تعليق (ملاحظة) في سطر واحد جنب الكود، هتكتبه إزاي بشكل صحيح؟",
+    options: ["# ملاحظة", "// ملاحظة", "<!-- ملاحظة -->", "** ملاحظة **"],
+    correct: 1
+  },
+  {
+    q: "شغّلنا السطر ده: cout << \"Ahlan\";  إيه اللي هيظهر على الشاشة؟",
+    code: "cout << \"Ahlan\";",
+    options: ["كلمة Ahlan", "رسالة خطأ", "الشاشة تفضل فاضية", "الرقم 0"],
+    correct: 0
+  },
+  {
+    q: "عايز تاخد رقم من المستخدم وتحطه في متغير، هتستخدم أي أمر؟",
+    options: ["cout", "read", "cin", "get"],
+    correct: 2
+  },
+  {
+    q: "عايز تخزن عمر شخص (رقم صحيح زي 15) في متغير، أنسب نوع بيانات إيه؟",
+    options: ["int", "char", "float", "bool"],
+    correct: 0
+  },
+  {
+    q: "عايز تخزن سعر منتج فيه فاصلة عشرية زي 25.75، أنسب نوع بيانات إيه؟",
+    options: ["int", "char", "float", "bool"],
+    correct: 2
+  },
+  {
+    q: "في السطر ده فيه خطأ، تقدر تلاقيه؟",
+    code: "cout << \"Hello World\"",
+    options: [
+      "ناقص فاصلة منقوطة ; في آخر السطر",
+      "الكلمة Hello غلط",
+      "لازم نستخدم cin بدل cout",
+      "مفيش خطأ خالص"
+    ],
+    correct: 0
+  },
+  {
+    q: "في الكود ده فيه خطأ، إيه هو؟",
+    code: "int x = 10\ncout << x;",
+    options: [
+      "ناقص فاصلة منقوطة ; بعد int x = 10",
+      "المتغير x اسمه غلط",
+      "لازم نكتب float بدل int",
+      "الكود صحيح 100%"
+    ],
+    correct: 0
+  },
+  {
+    q: "إيه الناتج اللي هيظهر لما نشغل الكود ده؟",
+    code: "int x = 10;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
+    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
+    correct: 0
+  },
+  {
+    q: "إيه الناتج اللي هيظهر لما نشغل الكود ده؟",
+    code: "int x = 3;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
+    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
+    correct: 1
+  },
+  {
+    q: "في جملة if-else، امتى بالظبط بينفذ الكمبيوتر جزء else؟",
+    options: [
+      "لما الشرط يكون صح دايمًا",
+      "لما الشرط يكون غلط (false)",
+      "مبينفذش أبدًا",
+      "قبل ما يشوف الشرط أصلاً"
+    ],
+    correct: 1
+  },
+  {
+    q: "جملة switch بنستخدمها عشان إيه؟",
+    options: [
+      "لتكرار كود معين عدة مرات",
+      "للاختيار بين احتمالات كتير لنفس المتغير بدل ما نكتب if كتير",
+      "لإدخال بيانات من المستخدم",
+      "لتعريف دالة جديدة"
+    ],
+    correct: 1
+  },
+  {
+    q: "لو نسينا نكتب break بعد case معينة جوا switch، هيحصل إيه؟",
+    options: [
+      "البرنامج هيقف عن العمل فورًا",
+      "الكمبيوتر هيكمل تلقائيًا وينفذ الـ case اللي بعدها كمان",
+      "هيتجاهل كل الـ case اللي بعدها",
+      "مفيش أي تأثير خالص"
+    ],
+    correct: 1
+  },
+  {
+    q: "إيه الناتج اللي هيظهر لما نشغل الكود ده؟",
+    code: "int x = 2;\nswitch(x)\n{\n    case 1: cout << \"واحد\"; break;\n    case 2: cout << \"اتنين\"; break;\n    default: cout << \"غير ذلك\";\n}",
+    options: ["واحد", "اتنين", "غير ذلك", "لا يظهر شيء"],
+    correct: 1
+  },
+  {
+    q: "العامل المنطقي && (AND) معناه إيه؟",
+    options: [
+      "لازم الشرطين يكونوا صح مع بعض عشان الناتج يبقى صح",
+      "يكفي شرط واحد بس يكون صح",
+      "بيعكس الشرط",
+      "بيقارن بين قيمتين نصيتين"
+    ],
+    correct: 0
+  },
+  {
+    q: "العامل المنطقي || (OR) معناه إيه؟",
+    options: [
+      "لازم الشرطين يكونوا صح مع بعض",
+      "يكفي شرط واحد بس من الاتنين يكون صح عشان الناتج يبقى صح",
+      "بيعكس نتيجة الشرط",
+      "مالوش أي استخدام في if"
+    ],
+    correct: 1
+  },
+  {
+    q: "إيه المقصود بجملة if جوا if تانية (Nested if)؟",
+    options: [
+      "وضع جملة if بالكامل جوا جملة if أخرى",
+      "استخدام متغيرين في نفس السطر",
+      "تكرار الكود عدة مرات",
+      "دالة بتستدعي نفسها"
+    ],
+    correct: 0
+  },
+  {
+    q: "إيه الناتج اللي هيظهر لما نشغل الكود ده؟",
+    code: "int age = 20;\nif(age >= 18)\n{\n    if(age < 65)\n    {\n        cout << \"بالغ\";\n    }\n}",
+    options: ["بالغ", "لا يظهر شيء", "رسالة خطأ", "طفل"],
+    correct: 0
+  },
+  {
+    q: "أي رمز من دول بيدل على 'لا يساوي' (Not Equal) لما نقارن بين قيمتين؟",
+    options: ["==", "=", "!=", "<>"],
+    correct: 2
+  }
+];
+
+const TOTAL_TIME = 15 * 60; // 15 minutes in seconds
+let timeLeft = TOTAL_TIME;
+let timerInterval;
+let userAnswers = new Array(questions.length).fill(null);
+let submitted = false;
+let studentName = "";
+
+function renderQuiz(){
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + idx;
+
+    let codeHtml = '';
+    if(item.code){
+      codeHtml = `<div class="q-code">${item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    }
+
+    let optionsHtml = '';
+    item.options.forEach((opt, oIdx) => {
+      optionsHtml += `
+        <label class="option" data-q="${idx}" data-o="${oIdx}">
+          <input type="radio" name="q${idx}" value="${oIdx}">
+          <span>${opt}</span>
+        </label>`;
+    });
+
+    card.innerHTML = `
+      <div><span class="q-number">${idx+1}</span></div>
+      <div class="q-text">${item.q}</div>
+      ${codeHtml}
+      <div class="options">${optionsHtml}</div>
+    `;
+    area.appendChild(card);
+  });
+
+  document.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const qIdx = parseInt(this.dataset.q);
+      const oIdx = parseInt(this.dataset.o);
+      userAnswers[qIdx] = oIdx;
+      const card = document.getElementById('card-'+qIdx);
+      card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      card.classList.remove('unanswered');
+      this.querySelector('input').checked = true;
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress(){
+  const answered = userAnswers.filter(a => a !== null).length;
+  const pct = (answered / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = (sec%60).toString().padStart(2,'0');
+  return m + ':' + s;
+}
+
+function startTimer(){
+  const timerEl = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = formatTime(timeLeft);
+    if(timeLeft <= 60){
+      timerEl.classList.add('warn');
+    }
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      finishExam(true);
+    }
+  }, 1000);
+}
+
+function finishExam(autoSubmit){
+  if(submitted) return;
+
+  if(!autoSubmit){
+    const unanswered = userAnswers.some(a => a === null);
+    if(unanswered){
+      document.getElementById('not-answered-warning').style.display = 'block';
+      userAnswers.forEach((a, idx) => {
+        if(a === null){
+          document.getElementById('card-'+idx).classList.add('unanswered');
+        }
+      });
+      return;
+    }
+  }
+
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('not-answered-warning').style.display = 'none';
+
+  let score = 0;
+  const reviewArea = document.getElementById('review-area');
+  reviewArea.innerHTML = '';
+
+  questions.forEach((item, idx) => {
+    const userA = userAnswers[idx];
+    const isCorrect = userA === item.correct;
+    if(isCorrect) score++;
+
+    const div = document.createElement('div');
+    div.className = 'card review-item' + (isCorrect ? '' : ' wrong');
+
+    let codeHtml = '';
+    if(item.code){
+      codeHtml = `<div class="q-code">${item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    }
+
+    let userAnswerText = userA === null ? 'لم تتم الإجابة' : item.options[userA];
+    let answerHtml = '';
+    if(isCorrect){
+      answerHtml = `<div class="answer-line correct">إجابتك: ${userAnswerText} ✓ إجابة صحيحة</div>`;
+    } else {
+      answerHtml = `
+        <div class="answer-line wrong">إجابتك: ${userAnswerText} ✗</div>
+        <div class="answer-line correct">الإجابة الصحيحة: ${item.options[item.correct]}</div>
+      `;
+    }
+
+    div.innerHTML = `
+      <div><span class="q-number">${idx+1}</span></div>
+      <div class="q-text">${item.q}</div>
+      ${codeHtml}
+      ${answerHtml}
+    `;
+    reviewArea.appendChild(div);
+  });
+
+  const total = questions.length;
+  document.getElementById('score-num').textContent = score + ' / ' + total;
+  const pct = Math.round((score/total)*100);
+  let msg = '';
+  if(pct >= 90) msg = 'ممتاز! أداء رائع 🌟';
+  else if(pct >= 75) msg = 'جيد جدًا! استمر في المذاكرة 👏';
+  else if(pct >= 50) msg = 'جيد، يحتاج لمزيد من المراجعة 📘';
+  else msg = 'يُنصح بمراجعة الدروس من البداية 🔁';
+  document.getElementById('score-msg').textContent = `${studentName} — نسبة النجاح: ${pct}% — ${msg}`;
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('ar-EG');
+  document.getElementById('print-meta').innerHTML =
+    `<strong>تقرير امتحان C++ (Control Flow)</strong><br>الطالب: ${studentName} | التاريخ: ${dateStr} | الدرجة: ${score} / ${total}`;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.querySelector('.footer-bar').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  document.getElementById('send-all-btn').onclick = function(){
+    document.getElementById('send-instructions').style.display = 'block';
+    window.print();
+    const message = `نتيجة امتحان C++ (Control Flow)\nاسم الطالب: ${studentName}\nالدرجة: ${score} من ${total}\nالنسبة: ${pct}%\n(مرفق التقرير الكامل PDF بالأسئلة والإجابات)`;
+    const url = `https://wa.me/${TEACHER_PHONE}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+}
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  const nameInput = document.getElementById('student-name');
+  const name = nameInput.value.trim();
+  if(name === ''){
+    document.getElementById('name-warning').style.display = 'block';
+    nameInput.focus();
+    return;
+  }
+  studentName = name;
+  document.getElementById('start-screen').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'block';
+  document.querySelector('.footer-bar').style.display = 'block';
+  renderQuiz();
+  startTimer();
+});
+
+document.getElementById('submit-btn').addEventListener('click', () => finishExam(false));
+</script>
+
+</body>
+</html>
