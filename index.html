@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -574,11 +575,17 @@ function finishExam(autoSubmit){
     const unanswered = userAnswers.some(a => a === null);
     if(unanswered){
       document.getElementById('not-answered-warning').style.display = 'block';
+      let firstUnansweredIdx = null;
       userAnswers.forEach((a, idx) => {
         if(a === null){
           document.getElementById('card-'+idx).classList.add('unanswered');
+          if(firstUnansweredIdx === null) firstUnansweredIdx = idx;
         }
       });
+      if(firstUnansweredIdx !== null){
+        const targetCard = document.getElementById('card-'+firstUnansweredIdx);
+        targetCard.scrollIntoView({behavior:'smooth', block:'center'});
+      }
       return;
     }
   }
