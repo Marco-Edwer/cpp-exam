@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz 1 in C++</title>
+<title>C++ Full Exam</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -260,9 +259,9 @@
 <div class="container">
 
   <div class="header">
-    <div id="timer">15:00</div>
+    <div id="timer">30:00</div>
     <div>
-      <h1 style="direction:ltr; unicode-bidi:isolate;">Quiz 1 in C++</h1>
+      <h1 style="direction:ltr; unicode-bidi:isolate;">C++ Full Exam</h1>
       <p style="margin-top:2px; font-weight:500;">إعداد: Eng.Marco Edwer</p>
     </div>
   </div>
@@ -290,7 +289,7 @@
     <div id="report-content">
       <div id="print-meta" class="score-card" style="padding:24px;">
         <div id="score-emoji" style="font-size:3rem; line-height:1; margin-bottom:6px;"></div>
-        <div class="score-num" id="score-num">0 / 20</div>
+        <div class="score-num" id="score-num">0 / 40</div>
         <div class="score-msg" id="score-msg"></div>
         <div class="action-buttons">
           <a class="pdf-btn" id="send-wa-btn" href="#" target="_blank" style="background:#25D366; text-decoration:none;">📱 إرسال التقرير على واتساب</a>
@@ -308,158 +307,299 @@ window.scrollTo(0,0);
 const TEACHER_PHONE = "201275166855"; // رقم واتساب المستر
 
 const questions = [
+  // ===== Control Statements (6) =====
   {
-    q: "ما اسم الملف الرأسي (Header File) الذي يجب تضمينه في بداية البرنامج لاستخدام الأمرين cin و cout؟",
-    options: ["conio.h", "iostream", "stdio.h", "math.h"],
+    q: "What is the output of the following code? (Note the use of short-circuit evaluation)",
+    code: "int a = 0;\nif(a != 0 && (10 / a) > 1)\n    cout << \"X\";\nelse\n    cout << \"Y\";",
+    options: ["X", "Y", "Runtime Error (division by zero)", "Compilation Error"],
     correct: 1
   },
   {
-    q: "من أي دالة (Function) يبدأ تنفيذ أي برنامج مكتوب بلغة ++C؟",
-    options: ["start()", "run()", "main()", "begin()"],
+    q: "What is the output of the following switch statement with fall-through cases?",
+    code: "int x = 4;\nswitch(x)\n{\n    case 1:\n    case 2:\n    case 3:\n        cout << \"Low\";\n        break;\n    case 4:\n    case 5:\n        cout << \"Mid\";\n        break;\n    default:\n        cout << \"High\";\n}",
+    options: ["Low", "Mid", "High", "LowMid"],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code using nested ternary operators?",
+    code: "int x = 15;\nstring result = (x < 10) ? \"A\" : (x < 20) ? \"B\" : \"C\";\ncout << result;",
+    options: ["A", "B", "C", "Compilation Error"],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code? (Watch the operator used inside the if condition)",
+    code: "int x = 5;\nif(x = 0)\n    cout << \"True\";\nelse\n    cout << \"False\";",
+    options: ["True", "False", "Compilation Error", "Runtime Error"],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code? (This is a classic C++ pitfall)",
+    code: "int a = 3, b = 4, c = 5;\nif(a < b < c)\n    cout << \"T\";\nelse\n    cout << \"F\";",
+    options: ["T (because (a<b) evaluates to 1, and 1<c is true)", "F", "Compilation Error", "Undefined Behavior"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following nested if-else code, where a variable is modified inside the block?",
+    code: "int x = 10, y = 20;\nif(x > 5)\n{\n    x += 5;\n    if(y > x)\n        cout << \"A\";\n    else\n        cout << \"B\";\n}\nelse if(x > 0)\n{\n    cout << \"C\";\n}\nelse\n{\n    cout << \"D\";\n}",
+    options: ["A", "B", "C", "D"],
+    correct: 0
+  },
+  // ===== Loops (10) =====
+  {
+    q: "What is the output of the following code with a nested loop and a conditional break in the inner loop?",
+    code: "for(int i = 0; i < 3; i++)\n{\n    for(int j = 0; j < 3; j++)\n    {\n        if(i == j)\n            break;\n        cout << i << j;\n    }\n}",
+    options: ["102021", "001122", "010212", "012021"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following code? (Pay attention to the post-increment operator inside the condition)",
+    code: "int i = 0;\nwhile(i++ < 3)\n{\n    cout << i;\n}",
+    options: ["123", "012", "1234", "023"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following for-loop that uses the comma operator with two counters?",
+    code: "for(int i = 0, j = 5; i < j; i++, j--)\n{\n    cout << i << j;\n}",
+    options: ["051423", "0512233445", "0123", "54321"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following do-while loop?",
+    code: "int i = 10;\ndo\n{\n    cout << i;\n    i -= 3;\n} while(i > 0);",
+    options: ["10741", "1074", "10", "10741-2"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following code with a nested loop using continue in the inner loop?",
+    code: "for(int i = 1; i <= 2; i++)\n{\n    for(int j = 1; j <= 3; j++)\n    {\n        if(j == 2)\n            continue;\n        cout << i << j;\n    }\n}",
+    options: ["11132123", "111213212223", "1123", "112213"],
+    correct: 0
+  },
+  {
+    q: "What happens when the following code is executed?",
+    code: "for(unsigned int i = 5; i >= 0; i--)\n{\n    cout << i;\n}",
+    options: [
+      "It prints 543210 and stops",
+      "This is an infinite loop, because an unsigned integer can never be negative, so i >= 0 is always true",
+      "Compilation Error",
+      "It prints 5432100"
+    ],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code that computes a product using a while loop?",
+    code: "int i = 1, product = 1;\nwhile(i <= 4)\n{\n    product *= i;\n    i++;\n}\ncout << product;",
+    options: ["24", "10", "4", "1"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following code? (Note that break inside a switch only exits the switch, not the enclosing loop)",
+    code: "for(int i = 0; i < 3; i++)\n{\n    switch(i)\n    {\n        case 1:\n            break;\n        default:\n            cout << i;\n    }\n}",
+    options: ["02", "012", "0", "Infinite Loop"],
+    correct: 0
+  },
+  {
+    q: "What is the time complexity of the following nested loop, where the inner loop's bound depends on the outer loop's counter?",
+    code: "for(int i = 0; i < n; i++)\n{\n    for(int j = 0; j < i; j++)\n    {\n        cout << i << j;\n    }\n}",
+    options: ["O(n)", "O(n log n)", "O(n^2)", "O(2^n)"],
     correct: 2
   },
   {
-    q: "ما الصيغة الصحيحة لكتابة تعليق (Comment) في سطر واحد داخل الشيفرة البرمجية؟",
-    options: ["# ملاحظة", "// ملاحظة", "<!-- ملاحظة -->", "** ملاحظة **"],
-    correct: 1
-  },
-  {
-    q: "ما الناتج المتوقع عند تنفيذ السطر البرمجي التالي؟",
-    code: "cout << \"Ahlan\";",
-    options: ["ظهور كلمة Ahlan", "رسالة خطأ", "بقاء الشاشة فارغة", "ظهور الرقم 0"],
+    q: "What is the output of the following code, given that a do-while loop always executes its body at least once?",
+    code: "int i = 100;\ndo\n{\n    cout << \"Run\";\n} while(i < 10);",
+    options: ["Run", "Nothing is printed", "Infinite Loop", "Compilation Error"],
     correct: 0
   },
+  // ===== Arrays (8) =====
   {
-    q: "أي أمر يُستخدم لإدخال قيمة من المستخدم عبر لوحة المفاتيح وتخزينها في متغير؟",
-    options: ["cout", "read", "cin", "get"],
+    q: "What is the output of the following code that uses pointer arithmetic on an array?",
+    code: "int arr[5] = {10, 20, 30, 40, 50};\ncout << *(arr + 2);",
+    options: ["10", "20", "30", "Compilation Error"],
     correct: 2
   },
   {
-    q: "أي نوع بيانات هو الأنسب لتخزين عدد صحيح مثل عمر شخص (15 سنة)؟",
-    options: ["int", "char", "float", "bool"],
+    q: "What is the output of the following code, which is a common technique to compute the number of elements in an array?",
+    code: "int arr[10];\ncout << sizeof(arr) / sizeof(arr[0]);",
+    options: ["10", "40", "4", "Compilation Error"],
     correct: 0
   },
   {
-    q: "أي نوع بيانات هو الأنسب لتخزين قيمة عشرية مثل سعر منتج (25.75)؟",
-    options: ["int", "char", "float", "bool"],
+    q: "What is the output of the following code that traverses a 2D array conditionally?",
+    code: "int arr[2][3] = {{1,2,3},{4,5,6}};\nfor(int i = 0; i < 2; i++)\n    for(int j = 0; j < 3; j++)\n        if((i + j) % 2 == 0)\n            cout << arr[i][j];",
+    options: ["135", "246", "123456", "15"],
+    correct: 0
+  },
+  {
+    q: "What does the following code print? (This demonstrates array-to-pointer decay when passed to a function)",
+    code: "void printSize(int arr[])\n{\n    cout << sizeof(arr);\n}\n\nint main()\n{\n    int nums[10];\n    printSize(nums);\n}",
+    options: [
+      "40 (10 elements * 4 bytes)",
+      "10 (the number of elements)",
+      "The size of a pointer (e.g. 8 bytes on a 64-bit system), NOT the array's size",
+      "Compilation Error"
+    ],
     correct: 2
   },
   {
-    q: "ما الخطأ الموجود في السطر البرمجي التالي؟",
-    code: "cout << \"Hello World\"",
+    q: "What is the output of the following code, where the array is only partially initialized?",
+    code: "int arr[5] = {1, 2};\ncout << arr[4];",
     options: [
-      "عدم وجود فاصلة منقوطة ; في نهاية السطر",
-      "خطأ في كتابة الكلمة Hello",
-      "يجب استخدام cin بدلًا من cout",
-      "لا يوجد أي خطأ"
+      "0 (remaining elements are automatically zero-initialized)",
+      "Garbage value (Undefined Behavior)",
+      "2",
+      "Compilation Error"
     ],
     correct: 0
   },
   {
-    q: "ما الخطأ الموجود في الشيفرة البرمجية التالية؟",
-    code: "int y = 5;\nif(y = 10)\n{\n    cout << \"القيمة عشرة\";\n}",
-    options: [
-      "تم استخدام = بدلًا من == لإجراء المقارنة",
-      "نسيان الفاصلة المنقوطة ;",
-      "خطأ في اسم المتغير y",
-      "لا يوجد أي خطأ"
-    ],
-    correct: 0
-  },
-  {
-    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
-    code: "int x = 10;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
-    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
-    correct: 0
-  },
-  {
-    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
-    code: "int x = 3;\nif(x > 5)\n{\n    cout << \"رقم كبير\";\n}\nelse\n{\n    cout << \"رقم صغير\";\n}",
-    options: ["رقم كبير", "رقم صغير", "لا يظهر شيء", "رسالة خطأ"],
+    q: "What is the output of the following code that passes a 2D array to a function and modifies it?",
+    code: "void modify(int arr[][3], int rows)\n{\n    for(int i = 0; i < rows; i++)\n        arr[i][0] = 0;\n}\n\nint main()\n{\n    int a[2][3] = {{1,2,3},{4,5,6}};\n    modify(a, 2);\n    cout << a[1][0];\n}",
+    options: ["4", "0", "1", "Compilation Error"],
     correct: 1
   },
   {
-    q: "متى يتم تنفيذ الجزء الخاص بـ else في جملة الشرط if-else؟",
+    q: "Given `int arr[5] = {1,2,3,4,5};`, what happens when you access `arr[-1]`?",
     options: [
-      "عندما يكون الشرط صحيحًا دائمًا",
-      "عندما يكون الشرط غير محقق (false)",
-      "لا يتم تنفيذه أبدًا",
-      "قبل التحقق من الشرط"
+      "It safely returns 0",
+      "It always returns the last element (5)",
+      "Undefined Behavior — C++ performs no bounds checking, so this accesses memory before the array",
+      "Compilation Error, because arrays disallow negative indices"
     ],
-    correct: 1
-  },
-  {
-    q: "ما الغرض من استخدام جملة switch في البرمجة؟",
-    options: [
-      "تكرار تنفيذ جزء من الشيفرة عدة مرات",
-      "الاختيار بين عدة احتمالات لقيمة متغير واحد بدلًا من استخدام عدة جمل if",
-      "إدخال البيانات من المستخدم",
-      "تعريف دالة جديدة"
-    ],
-    correct: 1
-  },
-  {
-    q: "ماذا يحدث إذا تم إغفال كتابة break بعد إحدى حالات (case) جملة switch؟",
-    options: [
-      "يتوقف البرنامج عن العمل فورًا",
-      "يستمر التنفيذ تلقائيًا في الحالة (case) التالية",
-      "يتم تجاهل جميع الحالات التالية",
-      "لا يحدث أي تأثير"
-    ],
-    correct: 1
-  },
-  {
-    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
-    code: "int x = 2;\nswitch(x)\n{\n    case 1: cout << \"واحد\"; break;\n    case 2: cout << \"اثنان\"; break;\n    default: cout << \"غير ذلك\";\n}",
-    options: ["واحد", "اثنان", "غير ذلك", "لا يظهر شيء"],
-    correct: 1
-  },
-  {
-    q: "ما المقصود بالعامل المنطقي && (AND)؟",
-    options: [
-      "يجب أن يتحقق الشرطان معًا حتى تكون النتيجة صحيحة",
-      "يكفي تحقق أحد الشرطين فقط",
-      "يقوم بعكس نتيجة الشرط",
-      "يُستخدم لمقارنة القيم النصية"
-    ],
-    correct: 0
-  },
-  {
-    q: "ما المقصود بالعامل المنطقي || (OR)؟",
-    options: [
-      "يجب أن يتحقق الشرطان معًا",
-      "يكفي تحقق أحد الشرطين فقط لتكون النتيجة صحيحة",
-      "يعكس نتيجة الشرط",
-      "لا يُستخدم داخل جملة if"
-    ],
-    correct: 1
-  },
-  {
-    q: "ما المقصود بمصطلح الشرط المتداخل (Nested if)؟",
-    options: [
-      "وضع جملة if كاملة داخل جملة if أخرى",
-      "استخدام أكثر من متغير في السطر نفسه",
-      "تكرار تنفيذ الشيفرة عدة مرات",
-      "دالة تستدعي نفسها"
-    ],
-    correct: 0
-  },
-  {
-    q: "ما الناتج المتوقع عند تنفيذ الشيفرة البرمجية التالية؟",
-    code: "int age = 65;\nif(age >= 18)\n{\n    if(age < 65)\n    {\n        cout << \"بالغ\";\n    }\n    else\n    {\n        cout << \"كبير السن\";\n    }\n}\nelse\n{\n    cout << \"طفل\";\n}",
-    options: ["بالغ", "كبير السن", "طفل", "لا يظهر شيء"],
-    correct: 1
-  },
-  {
-    q: "أي رمز من الرموز التالية يُستخدم للتعبير عن عدم التساوي (Not Equal) بين قيمتين؟",
-    options: ["==", "=", "!=", "<>"],
     correct: 2
+  },
+  {
+    q: "What is the value of arr[1] after the following in-place array reversal code executes?",
+    code: "int arr[5] = {1,2,3,4,5};\nint start = 0, end = 4;\nwhile(start < end)\n{\n    int temp = arr[start];\n    arr[start] = arr[end];\n    arr[end] = temp;\n    start++;\n    end--;\n}\ncout << arr[1];",
+    options: ["2", "4", "5", "1"],
+    correct: 1
+  },
+  // ===== Vectors (6) =====
+  {
+    q: "What is the most likely outcome of running the following code?",
+    code: "vector<int> v = {1, 2, 3, 4, 5};\nfor(auto it = v.begin(); it != v.end(); it++)\n{\n    if(*it == 3)\n        v.erase(it);\n}\ncout << v.size();",
+    options: [
+      "4",
+      "5",
+      "Undefined Behavior — erase() invalidates the iterator, and incrementing it afterward is unsafe",
+      "Compilation Error"
+    ],
+    correct: 2
+  },
+  {
+    q: "What is the output of the following code that shows the difference between size() and capacity()?",
+    code: "vector<int> v;\nv.reserve(10);\ncout << v.size() << \" \" << v.capacity();",
+    options: ["0 10", "10 10", "10 0", "0 0"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following code that passes a vector by reference to a function?",
+    code: "void addElement(vector<int> &v)\n{\n    v.push_back(100);\n}\n\nint main()\n{\n    vector<int> nums = {1,2,3};\n    addElement(nums);\n    cout << nums.size();\n}",
+    options: ["3", "4", "Compilation Error", "0"],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code that uses a vector of vectors (jagged rows)?",
+    code: "vector<vector<int>> matrix = {{1,2},{3,4,5}};\ncout << matrix[1].size();",
+    options: ["2", "3", "5", "Compilation Error"],
+    correct: 1
+  },
+  {
+    q: "What is the key difference in behavior between accessing an out-of-range index using v[i] versus v.at(i) for a vector v?",
+    options: [
+      "v[i] throws std::out_of_range while v.at(i) causes Undefined Behavior",
+      "v.at(i) performs bounds checking and throws std::out_of_range on an invalid index, while v[i] does NOT check bounds and causes Undefined Behavior",
+      "Both behave identically and throw the same exception",
+      "v[i] always causes a Compilation Error for invalid indices"
+    ],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code that combines erase() and insert() on a vector?",
+    code: "vector<int> v = {10, 20, 30, 40};\nv.erase(v.begin() + 1);\nv.insert(v.begin(), 5);\ncout << v[2];",
+    options: ["10", "20", "30", "40"],
+    correct: 2
+  },
+  // ===== Functions (6) =====
+  {
+    q: "What is the output of the following code that uses function overloading?",
+    code: "void show(int x) { cout << \"int\"; }\nvoid show(double x) { cout << \"double\"; }\n\nint main()\n{\n    show(5);\n    show(5.5);\n    show('A');\n}",
+    options: ["intdoubleint", "intdoubledouble", "doubledoubleint", "Compilation Error - ambiguous call"],
+    correct: 0
+  },
+  {
+    q: "What is the output of the following code that uses default arguments?",
+    code: "int calc(int a, int b = 10, int c = 20)\n{\n    return a + b + c;\n}\n\nint main()\n{\n    cout << calc(5, 5);\n}",
+    options: ["15", "30", "35", "Compilation Error"],
+    correct: 1
+  },
+  {
+    q: "What is the output of the following code that uses a static local variable?",
+    code: "void counter()\n{\n    static int count = 0;\n    count++;\n    cout << count;\n}\n\nint main()\n{\n    counter();\n    counter();\n    counter();\n}",
+    options: ["111", "123", "000", "Compilation Error"],
+    correct: 1
+  },
+  {
+    q: "What is the most likely outcome of running the following code?",
+    code: "int& getValue()\n{\n    int x = 42;\n    return x;\n}\n\nint main()\n{\n    int& ref = getValue();\n    cout << ref;\n}",
+    options: [
+      "42",
+      "0",
+      "Undefined Behavior — the function returns a reference to a local variable that no longer exists after the function returns",
+      "Compilation Error, this code cannot compile"
+    ],
+    correct: 2
+  },
+  {
+    q: "What is the output of the following code, which attempts to swap two variables?",
+    code: "void swap(int a, int b)\n{\n    int temp = a;\n    a = b;\n    b = temp;\n}\n\nint main()\n{\n    int x = 5, y = 10;\n    swap(x, y);\n    cout << x << \" \" << y;\n}",
+    options: [
+      "5 10 (pass by value does not affect the original variables)",
+      "10 5",
+      "0 0",
+      "Compilation Error"
+    ],
+    correct: 0
+  },
+  {
+    q: "What happens when the following code is compiled?",
+    code: "void process(int a, int b = 0) { cout << \"A\"; }\nvoid process(int a) { cout << \"B\"; }\n\nint main()\n{\n    process(5);\n}",
+    options: ["A", "B", "AB", "Compilation Error — the call process(5) is ambiguous"],
+    correct: 3
+  },
+  // ===== Recursion (4) =====
+  {
+    q: "What is the output of the following recursive Fibonacci code?",
+    code: "int fib(int n)\n{\n    if(n <= 1)\n        return n;\n    return fib(n - 1) + fib(n - 2);\n}\n\nint main()\n{\n    cout << fib(5);\n}",
+    options: ["3", "5", "8", "13"],
+    correct: 1
+  },
+  {
+    q: "What is the time complexity of the naive recursive Fibonacci function fib(n) = fib(n-1) + fib(n-2), without memoization?",
+    options: ["O(n)", "O(n log n)", "O(n^2)", "O(2^n)"],
+    correct: 3
+  },
+  {
+    q: "What is the output of the following recursive code that prints both before and after the recursive call?",
+    code: "void printNums(int n)\n{\n    if(n == 0)\n        return;\n    cout << n;\n    printNums(n - 1);\n    cout << n;\n}\n\nint main()\n{\n    printNums(3);\n}",
+    options: ["321123", "123321", "321321", "123123"],
+    correct: 0
+  },
+  {
+    q: "Two functions A() and B() call each other (A calls B, and B calls A) with no base case to stop the recursion. What is this called, and what is the likely outcome?",
+    options: [
+      "Tail Recursion — the compiler optimizes it automatically and it runs efficiently",
+      "Indirect (Mutual) Recursion — without a base case, this leads to infinite recursive calls and most likely a Stack Overflow",
+      "This is invalid syntax and the code will not compile",
+      "Direct Recursion — it automatically terminates after one cycle"
+    ],
+    correct: 1
   }
 ];
 
-const TOTAL_TIME = 15 * 60; // 15 minutes in seconds
+const TOTAL_TIME = 30 * 60; // 30 minutes in seconds
 let timeLeft = TOTAL_TIME;
 let timerInterval;
+let examStartTimestamp = null; // وقت البداية الحقيقي (wall-clock) لضمان استمرار العد حتى لو تم إخفاء المتصفح
 let userAnswers = new Array(questions.length).fill(null);
 let submitted = false;
 let studentName = "";
@@ -548,8 +688,18 @@ function formatTime(sec){
 
 function startTimer(){
   const timerEl = document.getElementById('timer');
-  timerInterval = setInterval(() => {
-    timeLeft--;
+  examStartTimestamp = Date.now();
+
+  function tick(){
+    if(submitted) return;
+    // نحسب الوقت المتبقي دائمًا من الفارق الحقيقي بين الآن ولحظة البداية،
+    // بدل الاعتماد فقط على عدّاد setInterval الذي يتباطأ أو يتوقف عندما
+    // يقوم الطالب بإخفاء المتصفح أو الانتقال لتبويب آخر (مثل البحث عن الإجابة).
+    // بهذه الطريقة يستمر العدّ التنازلي بدقة حتى لو رجع الطالب بعد دقائق.
+    const elapsed = Math.floor((Date.now() - examStartTimestamp) / 1000);
+    timeLeft = TOTAL_TIME - elapsed;
+    if(timeLeft < 0) timeLeft = 0;
+
     timerEl.textContent = formatTime(timeLeft);
     if(timeLeft <= 60 && timeLeft > 0){
       timerEl.classList.add('warn');
@@ -560,7 +710,18 @@ function startTimer(){
       clearInterval(timerInterval);
       finishExam(true);
     }
-  }, 1000);
+  }
+
+  tick();
+  timerInterval = setInterval(tick, 1000);
+
+  // عند رجوع الطالب للتبويب/المتصفح، نعيد الحساب فورًا لتصحيح أي فارق
+  // ناتج عن إبطاء المتصفح للمؤقتات في الخلفية.
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible' && !submitted && examStartTimestamp !== null){
+      tick();
+    }
+  });
 }
 
 let finalScore = 0;
@@ -666,7 +827,7 @@ document.getElementById('send-wa-btn').addEventListener('click', function(e){
   const divider = '━━━━━━━━━━━━━━';
 
   let lines = [];
-  lines.push('📊 *تقرير Quiz 1 in C++*');
+  lines.push('📊 *تقرير Quiz 2 in C++*');
   lines.push(divider);
   lines.push(`👤 *الاسم:* ${studentName}`);
   lines.push(`📅 *التاريخ:* ${dateStr}`);
