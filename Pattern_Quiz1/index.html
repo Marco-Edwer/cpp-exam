@@ -240,6 +240,13 @@ code{font-family:var(--mono);background:#e8eef7;padding:1px 6px;border-radius:5p
 .exp{direction:rtl;text-align:right;background:#fffbe6;border:1px solid #ffe08a;border-radius:10px;padding:12px 14px;margin-top:10px;line-height:1.9;font-size:1rem;color:#5c4400;}
 .exp, .exp *{font-family:'Segoe UI',Tahoma,'Noto Sans Arabic','Noto Naskh Arabic',Arial,sans-serif !important;}
 .exp b{display:block;margin-bottom:4px;}
+html,body{overflow-x:clip !important;}
+#top-sticky{position:sticky;top:0;z-index:30;background:var(--bg);}
+#top-sticky .header{margin-bottom:0;border-radius:16px 16px 0 0;}
+.card{scroll-margin-top:150px;}
+.submit-wrap{margin:6px 0 28px;text-align:center;}
+.submit-wrap button{width:100%;padding:16px;font-size:1.08rem;}
+#submit-warning{display:none;color:var(--wrong);font-weight:700;margin-bottom:12px;line-height:1.7;font-size:0.95rem;}
 .exp .ltr{unicode-bidi:isolate;direction:ltr;display:inline-block;font-family:var(--mono) !important;font-size:0.9em;font-weight:500;background:#fff3bf;padding:0 5px;border-radius:5px;}
 
 @media (max-width:600px){
@@ -257,14 +264,17 @@ code{font-family:var(--mono);background:#e8eef7;padding:1px 6px;border-radius:5p
   #start-screen input{max-width:none;width:100%;margin:12px 0;}
   #start-btn{display:block;width:100%;padding:14px 10px;font-size:1.05rem;}
   .exam-info{gap:8px;font-size:0.8rem;}
-  #quiz-area .card{margin:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:16px 14px 8px;}
-  #quiz-area .q-number{display:none;}
+  body{background:#eef2f9 !important;}
+  #top-sticky{background:#eef2f9;}
+  #top-sticky .header{border-radius:0;}
+  .card{scroll-margin-top:130px;}
+  #quiz-area{padding:10px 10px 0;}
+  #quiz-area .card{margin:0 0 12px;border-radius:14px;padding:16px 14px;}
+  .submit-wrap{margin:6px 0 24px;}
   .q-text{font-size:1.12rem;line-height:1.6;margin:0 0 14px;}
-  .code{font-size:0.95rem;padding:12px 14px;margin:0 0 14px;}
+  .code{font-size:0.9rem;padding:12px 14px;margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
   .option{padding:12px 14px;font-size:1.02rem;line-height:1.5;}
   .options{gap:10px;}
-  .nav-bar{margin:0;padding:12px 14px 24px;gap:10px;}
-  .nav-bar button{flex:1;min-width:0;padding:13px 10px;font-size:1rem;}
   #results{padding:0;}
   .score-card{padding:20px 12px;border-radius:0;}
   .score-num{font-size:2.5rem;}
@@ -277,6 +287,7 @@ code{font-family:var(--mono);background:#e8eef7;padding:1px 6px;border-radius:5p
 <body>
 <div class="container">
 
+  <div id="top-sticky">
   <div class="header">
     <div id="timer">30:00</div>
     <div>
@@ -301,6 +312,7 @@ code{font-family:var(--mono);background:#e8eef7;padding:1px 6px;border-radius:5p
 
   <div class="progress-wrap" style="display:none;"><div id="progress-bar"></div></div>
   <div class="progress-label" id="progress-label" style="display:none;"></div>
+  </div>
 
   <div id="quiz-area"></div>
 
@@ -606,81 +618,74 @@ function questionBody(item){
   return `<div class="q-text">${item.q}</div>` + (item.code ? `<pre class="code">${item.code}</pre>` : '');
 }
 
-function renderQuestion(idx){
+function answeredCount(){ return userAnswers.filter(a => a !== null).length; }
+
+function updateProgress(){
+  const n = answeredCount();
+  document.getElementById('progress-bar').style.width = ((n / questions.length) * 100) + '%';
+  document.getElementById('progress-label').textContent = `Answered ${n} of ${questions.length}`;
+}
+
+let warnedOnce = false;
+
+function renderAll(){
   const area = document.getElementById('quiz-area');
-  const item = questions[idx];
   area.innerHTML = '';
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.id = 'card-' + idx;
 
-  let optionsHtml = '';
-  item.options.forEach((opt, oIdx) => {
-    const sel = userAnswers[idx] === oIdx ? ' selected' : '';
-    optionsHtml += `
-      <label class="option${sel}${item.mono ? ' mono' : ''}" data-o="${oIdx}">
-        <input type="radio" name="q${idx}" value="${oIdx}" ${userAnswers[idx] === oIdx ? 'checked' : ''}>
-        <span>${opt}</span>
-      </label>`;
-  });
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + idx;
 
-  card.innerHTML = `
-    <div><span class="q-number">Question ${idx+1} / ${questions.length}</span></div>
-    ${questionBody(item)}
-    <div class="options">${optionsHtml}</div>`;
-  area.appendChild(card);
+    let optionsHtml = '';
+    item.options.forEach((opt, oIdx) => {
+      const sel = userAnswers[idx] === oIdx ? ' selected' : '';
+      optionsHtml += `
+        <label class="option${sel}${item.mono ? ' mono' : ''}" data-o="${oIdx}">
+          <input type="radio" name="q${idx}" value="${oIdx}" ${userAnswers[idx] === oIdx ? 'checked' : ''}>
+          <span>${opt}</span>
+        </label>`;
+    });
 
-  card.querySelectorAll('.option').forEach(opt => {
-    opt.addEventListener('click', function(){
-      userAnswers[idx] = parseInt(this.dataset.o);
-      card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-      this.classList.add('selected');
-      this.querySelector('input').checked = true;
-      card.classList.remove('unanswered');
-      document.getElementById('not-answered-warning').style.display = 'none';
+    card.innerHTML = `
+      <div><span class="q-number">Question ${idx+1} / ${questions.length}</span></div>
+      ${questionBody(item)}
+      <div class="options">${optionsHtml}</div>`;
+    area.appendChild(card);
+
+    card.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', function(){
+        userAnswers[idx] = parseInt(this.dataset.o);
+        card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input').checked = true;
+        card.classList.remove('unanswered');
+        updateProgress();
+      });
     });
   });
 
-  renderNavBar(idx);
-  updateProgress(idx);
-  document.getElementById('not-answered-warning').style.display = 'none';
-}
+  const wrap = document.createElement('div');
+  wrap.className = 'submit-wrap';
+  wrap.innerHTML = `<div id="submit-warning"></div><button class="btn-finish" id="finish-btn">Finish &amp; Submit ✔</button>`;
+  area.appendChild(wrap);
 
-function renderNavBar(idx){
-  const area = document.getElementById('quiz-area');
-  const navBar = document.createElement('div');
-  navBar.className = 'nav-bar';
-
-  const backBtn = document.createElement('button');
-  backBtn.className = 'btn-secondary';
-  backBtn.textContent = '⟵ Previous';
-  backBtn.disabled = idx === 0;
-  backBtn.addEventListener('click', () => {
-    if(currentQ > 0){ currentQ--; renderQuestion(currentQ); window.scrollTo({top:0, behavior:'smooth'}); }
-  });
-
-  const nextBtn = document.createElement('button');
-  const isLast = idx === questions.length - 1;
-  nextBtn.className = isLast ? 'btn-finish' : '';
-  nextBtn.textContent = isLast ? 'Finish & Submit ✔' : 'Next ⟶';
-  nextBtn.addEventListener('click', () => {
-    if(userAnswers[idx] === null){
-      document.getElementById('not-answered-warning').style.display = 'block';
-      document.getElementById('card-' + idx).classList.add('unanswered');
+  document.getElementById('finish-btn').addEventListener('click', function(){
+    const missing = [];
+    userAnswers.forEach((a, i) => { if(a === null) missing.push(i + 1); });
+    const warn = document.getElementById('submit-warning');
+    if(missing.length && !warnedOnce){
+      warnedOnce = true;
+      missing.forEach(n => document.getElementById('card-' + (n-1)).classList.add('unanswered'));
+      warn.textContent = `You have ${missing.length} unanswered question${missing.length > 1 ? 's' : ''}: ${missing.join(', ')}. Tap again to submit anyway.`;
+      warn.style.display = 'block';
+      this.textContent = 'Submit anyway ✔';
+      document.getElementById('card-' + (missing[0]-1)).scrollIntoView({behavior:'smooth', block:'start'});
       return;
     }
-    if(isLast){ finishExam(false); }
-    else { currentQ++; renderQuestion(currentQ); window.scrollTo({top:0, behavior:'smooth'}); }
+    finishExam(false);
   });
-
-  navBar.appendChild(backBtn);
-  navBar.appendChild(nextBtn);
-  area.appendChild(navBar);
-}
-
-function updateProgress(idx){
-  document.getElementById('progress-bar').style.width = (((idx+1) / questions.length) * 100) + '%';
-  document.getElementById('progress-label').textContent = `Question ${idx+1} of ${questions.length}`;
+  updateProgress();
 }
 
 let audioCtx = null;
@@ -892,7 +897,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
   document.getElementById('start-screen').style.display = 'none';
   document.querySelector('.progress-wrap').style.display = 'block';
   document.getElementById('progress-label').style.display = 'block';
-  renderQuestion(currentQ);
+  renderAll();
   startTimer();
   window.scrollTo({top:0, behavior:'auto'});
 });
