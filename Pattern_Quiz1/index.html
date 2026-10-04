@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Basics Exam</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --primary:#2b6cb0;
+    --primary-dark:#1a4971;
+    --accent:#0ea5a4;
+    --bg:#eef2f9;
+    --card:#ffffff;
+    --correct:#2f9e44;
+    --wrong:#e03131;
+    --border:#dbe3ee;
+    --text:#1f2937;
+    --muted:#64748b;
+    --pdf:#e8590c;
+    --pdf-dark:#c94a08;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:auto;overflow-x:hidden;width:100%;}
+  body{
+    margin:0;
+    overflow-x:hidden;
+    position:relative;
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:20px;
+  }
+  .container{max-width:800px;margin:0 auto;}
+  .header{
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;
+    padding:24px 28px;
+    border-radius:16px;
+    margin-bottom:18px;
+    display:flex;
+    flex-direction:row-reverse;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    box-shadow:0 6px 18px rgba(43,108,176,0.25);
+  }
+  .header h1{margin:0;font-size:1.25rem;font-weight:700;line-height:1.5;}
+  .header p{margin:6px 0 0;font-size:0.88rem;opacity:0.95;}
+  #timer{
+    background:rgba(255,255,255,0.2);
+    padding:10px 20px;
+    border-radius:12px;
+    font-size:1.4rem;
+    font-weight:900;
+    min-width:110px;
+    text-align:center;
+    letter-spacing:1px;
+  }
+  #timer.warn{background:#e03131;}
+  .progress-wrap{background:#d7e0ee;border-radius:8px;height:10px;margin-bottom:8px;overflow:hidden;}
+  #progress-bar{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));width:0%;transition:width 0.3s;}
+  .progress-label{text-align:center;color:var(--muted);font-size:0.85rem;margin-bottom:18px;font-weight:700;}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:24px;
+    margin-bottom:16px;
+    box-shadow:0 3px 12px rgba(30,41,59,0.07);
+    border:1px solid var(--border);
+  }
+  .q-number{
+    display:inline-block;
+    background:var(--primary);
+    color:#fff;
+    padding:0 12px;
+    height:32px;
+    border-radius:16px;
+    text-align:center;
+    line-height:32px;
+    font-size:0.9rem;
+    font-weight:700;
+    margin-right:10px;
+  }
+  .q-type-badge{
+    display:inline-block;
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:0.78rem;
+    font-weight:700;
+    margin-left:0;
+  }
+  .badge-mcq{background:#e7f1ff;color:var(--primary);}
+  .badge-tf{background:#e6fcf5;color:#0b7285;}
+  .badge-fill{background:#f3e8ff;color:#7048e8;}
+  .badge-essay{background:#fff4e6;color:#d9480f;}
+  .q-text{font-size:1.1rem;font-weight:700;margin:16px 0 20px;line-height:1.8;}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    border:2px solid var(--border);
+    border-radius:12px;
+    cursor:pointer;
+    transition:all 0.15s;
+    font-size:1rem;
+  }
+  .option:hover{border-color:var(--primary);background:#f0f6ff;}
+  .option.selected{border-color:var(--primary);background:#e7f1ff;font-weight:700;}
+  .option input{accent-color:var(--primary);}
+  textarea.essay-input{
+    width:100%;
+    min-height:150px;
+    padding:14px 16px;
+    border:2px solid var(--border);
+    border-radius:12px;
+    font-family:inherit;
+    font-size:1rem;
+    resize:vertical;
+    line-height:1.7;
+  }
+  textarea.essay-input:focus{outline:none;border-color:var(--primary);}
+  .essay-note{color:var(--muted);font-size:0.85rem;margin-top:8px;}
+  .nav-bar{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:6px;
+  }
+  button{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:14px 34px;
+    font-size:1.02rem;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    transition:all 0.15s;
+    font-family:inherit;
+  }
+  button:hover{background:var(--primary-dark);transform:translateY(-1px);}
+  button:disabled{background:#94a3b8;cursor:not-allowed;transform:none;}
+  .btn-secondary{background:#fff;color:var(--primary);border:2px solid var(--primary);padding:12px 32px;}
+  .btn-secondary:hover{background:#f0f6ff;}
+  .btn-finish{background:var(--correct);}
+  .btn-finish:hover{background:#2b8a3e;}
+  #results{display:none;}
+  .score-card{
+    text-align:center;
+    background:var(--card);
+    border-radius:16px;
+    padding:32px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(30,41,59,0.07);
+  }
+  .score-num{font-size:3.2rem;font-weight:900;color:var(--primary);}
+  .score-msg{font-size:1.05rem;color:var(--muted);margin-top:8px;font-weight:500;line-height:1.9;}
+  .review-item{border-left:5px solid var(--correct);}
+  .review-item.wrong{border-left:5px solid var(--wrong);}
+  .review-item.essay{border-left:5px solid var(--pdf);}
+  .answer-line{padding:11px 14px;border-radius:10px;margin-top:6px;font-size:0.95rem;}
+  .answer-line.correct{background:#ebfbee;color:var(--correct);font-weight:700;}
+  .answer-line.wrong{background:#fff5f5;color:var(--wrong);font-weight:700;}
+  .answer-line.essay{background:#fff8ef;color:#8a4b08;font-weight:500;white-space:pre-wrap;line-height:1.8;}
+  #not-answered-warning{color:var(--wrong);text-align:center;margin-bottom:10px;font-size:0.9rem;display:none;font-weight:700;}
+  .unanswered{border-color:#f59f00 !important;}
+  #start-screen{
+    background:var(--card);
+    border-radius:16px;
+    padding:36px 30px;
+    text-align:center;
+    box-shadow:0 3px 14px rgba(30,41,59,0.08);
+  }
+  #start-screen h2{margin-top:0;font-size:1.3rem;}
+  #start-screen p{color:var(--muted);}
+  #start-screen input{
+    width:100%;
+    max-width:320px;
+    padding:15px 16px;
+    font-size:1.05rem;
+    border:2px solid var(--border);
+    border-radius:12px;
+    margin:16px 0;
+    text-align:center;
+    font-family:inherit;
+  }
+  #start-screen input:focus{outline:none;border-color:var(--primary);}
+  #name-warning{color:var(--wrong);font-size:0.9rem;display:none;margin-bottom:10px;font-weight:700;}
+  .exam-info{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+    margin:18px 0;
+    font-size:0.88rem;
+    color:var(--muted);
+  }
+  .exam-info span{background:#f1f5f9;padding:6px 14px;border-radius:20px;font-weight:700;}
+  .action-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;}
+  .pdf-btn{background:var(--pdf);}
+  .pdf-btn:hover{background:var(--pdf-dark);}
+  .wa-btn{background:#25D366;}
+  .wa-btn:hover{background:#1ea952;}
+  #send-status{margin-top:14px;font-size:0.9rem;color:var(--muted);font-weight:700;min-height:20px;}
+  #pdf-report{position:fixed;left:0;top:0;width:750px;background:#fff;padding:30px;transform:translateX(-100%) translateX(-50px);pointer-events:none;z-index:-1;}
+
+  /* Mobile / tablet compatibility */
+  html, body{
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+    color-scheme:light;
+  }
+
+  
+/* تحسين عرض الامتحان على الموبايل: السؤال يستغل الشاشة بالكامل */
+@media (max-width: 600px){
+  html, body{
+    width:100%;
+    min-width:100%;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  body{
+    background:#fff !important;
+  }
+
+  .container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+  }
+
+  .header{
+    margin:0 !important;
+    border-radius:0 !important;
+    padding:12px 12px !important;
+  }
+
+  .progress-wrap{
+    margin:0 !important;
+    border-radius:0 !important;
+  }
+
+  .progress-label{
+    padding:8px 10px;
+  }
+
+  #quiz-area{
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  #quiz-area .card{
+    width:100% !important;
+    max-width:none !important;
+    min-height:calc(100vh - 125px) !important;
+    margin:0 !important;
+    border-radius:0 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    padding:22px 14px !important;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+  }
+
+  #quiz-area .q-text{
+    font-size:1.12rem !important;
+    line-height:1.9 !important;
+    margin-bottom:22px !important;
+  }
+
+  #quiz-area .option{
+    width:100% !important;
+    padding:15px 12px !important;
+    margin-bottom:10px !important;
+    font-size:1rem !important;
+    line-height:1.7 !important;
+  }
+
+  #quiz-area .nav-bar{
+    margin-top:auto !important;
+    padding-top:18px !important;
+    width:100% !important;
+  }
+
+  #quiz-area .nav-bar button{
+    min-height:48px !important;
+  }
+
+  #start-screen{
+    width:100% !important;
+    min-height:calc(100vh - 90px) !important;
+    margin:0 !important;
+    border-radius:0 !important;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  #results{
+    width:100% !important;
+    margin:0 !important;
+    border-radius:0 !important;
+  }
+}
+
+@media (max-width: 600px){
+    body{
+      padding:10px;
+      background:#eef2f9;
+    }
+
+    .container{
+      width:100%;
+      max-width:100%;
+    }
+
+    .header{
+      padding:16px 14px;
+      border-radius:12px;
+      flex-direction:column-reverse;
+      align-items:stretch;
+      text-align:left;
+      gap:10px;
+    }
+
+    .header h1{
+      font-size:1.05rem;
+      line-height:1.65;
+    }
+
+    .header p{
+      font-size:0.78rem;
+      line-height:1.6;
+    }
+
+    #timer{
+      align-self:center;
+      min-width:100px;
+      width:auto;
+      padding:8px 16px;
+      font-size:1.2rem;
+    }
+
+    .card{
+      padding:16px 12px;
+      border-radius:12px;
+    }
+
+    #start-screen{
+      padding:24px 14px;
+      border-radius:12px;
+    }
+
+    #start-screen input{
+      max-width:none;
+      width:100%;
+    }
+
+    .exam-info{
+      gap:8px;
+      font-size:0.8rem;
+    }
+
+    .exam-info span{
+      padding:6px 10px;
+      max-width:100%;
+    }
+
+    .q-text{
+      font-size:1rem;
+      line-height:1.85;
+      overflow-wrap:anywhere;
+    }
+
+    .option{
+      padding:12px 10px;
+      font-size:0.94rem;
+      line-height:1.65;
+      align-items:flex-start;
+      overflow-wrap:anywhere;
+    }
+
+    .option input{
+      flex:0 0 auto;
+      margin-top:4px;
+    }
+
+    .q-number{
+      margin-left:6px;
+      padding:0 9px;
+      height:30px;
+      line-height:30px;
+      font-size:0.82rem;
+    }
+
+    .q-type-badge{
+      padding:4px 8px;
+      font-size:0.72rem;
+      margin-right:0;
+    }
+
+    textarea.essay-input{
+      min-height:180px;
+      font-size:16px; /* prevents iOS Safari zoom */
+    }
+
+    .nav-bar{
+      gap:8px;
+    }
+
+    .nav-bar button,
+    #start-btn{
+      flex:1;
+      min-width:0;
+      padding:12px 10px;
+      font-size:0.92rem;
+    }
+
+    .score-card{
+      padding:22px 12px;
+    }
+
+    .score-num{
+      font-size:2.5rem;
+    }
+
+    .action-buttons{
+      flex-direction:column;
+    }
+
+    .action-buttons button{
+      width:100%;
+      padding:12px 10px;
+      font-size:0.9rem;
+    }
+
+    #pdf-report{
+      width:750px;
+    }
+  }
+
+
+.exp{direction:rtl;text-align:right;background:#fffbe6;border:1px solid #ffe08a;border-radius:10px;padding:12px 14px;margin-top:10px;line-height:1.9;font-size:0.95rem;color:#5c4400;}
+.exp b{display:block;margin-bottom:4px;}
+.code{direction:ltr;text-align:left;background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;
+  font-family:Consolas,'Courier New',monospace;white-space:pre;overflow-x:auto;font-size:0.95rem;line-height:1.65;margin:0 0 18px;tab-size:4;}
+.option.mono span{font-family:Consolas,'Courier New',monospace;}
+.q-text{font-family:inherit;}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;}
+.header{flex-direction:row-reverse;}
+@media (max-width:600px){ .header{flex-direction:column-reverse !important;} .code{font-size:0.85rem;padding:12px;} }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div id="timer">30:00</div>
+    <div>
+      <p style="margin:0 0 4px;font-size:0.85rem;font-weight:700;opacity:0.9;">Prepared by Eng. Marco Edwer</p>
+      <h1>Python Basics Exam</h1>
+      <p>Faculty of Computers &amp; Artificial Intelligence &mdash; Fourth Year</p>
+    </div>
+  </div>
+
+  <div id="start-screen">
+    <h2>Student Information</h2>
+    <p>Please enter your full name before starting the exam.</p>
+    <div id="name-warning">Please enter your name first.</div>
+    <input type="text" id="student-name" placeholder="Full name">
+    <div class="exam-info">
+      <span>⏱ Duration: 30 minutes</span>
+      <span>📝 Questions: 20</span>
+      <span>🔘 Multiple choice (one correct answer)</span>
+    </div>
+    <button id="start-btn">Start Exam</button>
+  </div>
+
+  <div class="progress-wrap" style="display:none;"><div id="progress-bar"></div></div>
+  <div class="progress-label" id="progress-label" style="display:none;"></div>
+
+  <div id="quiz-area"></div>
+
+  <div id="not-answered-warning">Please answer this question before continuing.</div>
+
+  <div class="results" id="results">
+    <div id="report-content">
+      <div class="score-card" style="padding:24px;">
+        <div id="score-emoji" style="font-size:3rem;line-height:1;margin-bottom:6px;"></div>
+        <div class="score-num" id="score-num">0 / 20</div>
+        <div class="score-msg" id="score-msg"></div>
+        <div class="action-buttons">
+          <button class="wa-btn" id="send-wa-btn">📱 Send report via WhatsApp</button>
+        </div>
+        <div id="send-status">A PDF report will be downloaded automatically on submission, then WhatsApp will open with a summary message.</div>
+      </div>
+      <div id="review-area"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="pdf-report"></div>
+
+<script>
+window.scrollTo(0,0);
+const TEACHER_PHONE = "201275166855";
+const EXAM_TITLE = "Python Basics Exam";
+
+const questions = [
+ {
+  "q": "What is the output of the following code?",
+  "code": "x = 7\ny = 2\nprint(x // y, x % y, x / y)",
+  "mono": true,
+  "options": [
+   "3.5 1 3",
+   "3 2 3.5",
+   "3 1 3.5",
+   "3 1 3"
+  ],
+  "correct": 2,
+  "exp": "العملية // هي قسمة صحيحة (تحذف الكسر) فـ 7 // 2 = 3، والعملية % بترجع الباقي = 1، أما / فهي قسمة عادية وبترجع float دايماً = 3.5."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(type(int(\"5\") + 2.0))",
+  "mono": true,
+  "options": [
+   "&lt;class 'float'&gt;",
+   "&lt;class 'int'&gt;",
+   "&lt;class 'str'&gt;",
+   "TypeError"
+  ],
+  "correct": 0,
+  "exp": "int(\"5\") بتحوّل النص إلى الرقم 5، ثم 5 + 2.0 = 7.0. وأي عملية بين int و float بيكون ناتجها float."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(2 + 3 * 2 ** 2 - 4 / 2)",
+  "mono": true,
+  "options": [
+   "20.0",
+   "10.0",
+   "16.0",
+   "12.0"
+  ],
+  "correct": 3,
+  "exp": "الترتيب: ** الأول (2**2 = 4)، بعدها * و / (3*4 = 12 و 4/2 = 2.0)، وآخر حاجة + و - من الشمال لليمين: 2 + 12 - 2.0 = 12.0. الناتج float بسبب عملية /."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(True or False and False)",
+  "mono": true,
+  "options": [
+   "False",
+   "True",
+   "None",
+   "SyntaxError"
+  ],
+  "correct": 1,
+  "exp": "الـ and ليها أولوية أعلى من or، فبتتنفذ الأول: False and False = False، بعدها True or False = True."
+ },
+ {
+  "q": "Which of the following is a valid variable name in Python?",
+  "code": "",
+  "mono": true,
+  "options": [
+   "2nd_value",
+   "my-var",
+   "_total_1",
+   "class"
+  ],
+  "correct": 2,
+  "exp": "اسم المتغير لا يبدأ برقم (2nd_value غلط)، ولا يحتوي على - (my-var غلط)، ولا يكون كلمة محجوزة مثل class. أما _total_1 فصحيح لأنه بيبدأ بـ underscore."
+ },
+ {
+  "q": "The user types <b>5</b> when the program runs. What is the output?",
+  "code": "x = input()\nprint(x * 3)",
+  "mono": true,
+  "options": [
+   "15",
+   "555",
+   "5 5 5",
+   "TypeError"
+  ],
+  "correct": 1,
+  "exp": "الدالة input() بترجع دايماً string حتى لو كتبت رقم، فـ \"5\" * 3 معناها تكرار النص 3 مرات = \"555\" وليس 15."
+ },
+ {
+  "q": "What is the exact output of the following code?",
+  "code": "print(\"A\", \"B\", sep=\"-\", end=\"!\")",
+  "mono": true,
+  "options": [
+   "A B!",
+   "A-B",
+   "A-B (then a new line)",
+   "A-B!"
+  ],
+  "correct": 3,
+  "exp": "المعامل sep بيحدد الفاصل بين العناصر (هنا -)، والمعامل end بيحدد اللي يتطبع في الآخر بدل السطر الجديد (هنا !). فالناتج A-B! بدون سطر جديد."
+ },
+ {
+  "q": "Which statement about Python syntax is correct?",
+  "code": "",
+  "mono": false,
+  "options": [
+   "Indentation is part of the syntax and defines code blocks",
+   "Every statement must end with a semicolon",
+   "Code blocks are enclosed in curly braces { }",
+   "Single-line comments start with //"
+  ],
+  "correct": 0,
+  "exp": "Python بتعتمد على الـ indentation (المسافات البادئة) لتحديد الـ blocks، ولا تستخدم { } ولا ; ، والتعليق بيبدأ بـ # وليس //."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(bool(\"False\"), bool(0), bool(\"\"))",
+  "mono": true,
+  "options": [
+   "False False False",
+   "True True False",
+   "True False False",
+   "False False True"
+  ],
+  "correct": 2,
+  "exp": "أي string غير فارغة قيمتها True حتى لو كانت \"False\"، فـ bool(\"False\") = True. أما bool(0) = False و bool(\"\") = False لأن الصفر والنص الفارغ قيمتهم False."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(int(-3.9), round(2.5), round(3.5))",
+  "mono": true,
+  "options": [
+   "-4 3 4",
+   "-3 3 4",
+   "-4 2 3",
+   "-3 2 4"
+  ],
+  "correct": 3,
+  "exp": "int(-3.9) بتقطع الجزء العشري ناحية الصفر فتعطي -3. أما round() في Python 3 فبتستخدم Banker's rounding: لو الرقم .5 بتقرّب لأقرب رقم زوجي، فـ round(2.5) = 2 و round(3.5) = 4."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "x = 15\nif x &gt; 10:\n    print(\"A\")\nelif x &gt; 5:\n    print(\"B\")\nelse:\n    print(\"C\")\nif x % 5 == 0:\n    print(\"D\")",
+  "mono": false,
+  "options": [
+   "A, then D (on two lines)",
+   "A only",
+   "A, B and D",
+   "B, then D (on two lines)"
+  ],
+  "correct": 0,
+  "exp": "x = 15 أكبر من 10، فبيطبع A وبيتخطى elif و else. بعدها الـ if التانية منفصلة: 15 % 5 == 0 صحيح، فبيطبع D. الناتج A ثم D."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "a, b = 4, 9\nif a &gt; 3:\n    if b &lt; 5:\n        print(\"X\")\n    else:\n        print(\"Y\")\nelse:\n    print(\"Z\")",
+  "mono": true,
+  "options": [
+   "X",
+   "Y",
+   "Z",
+   "Y and Z"
+  ],
+  "correct": 1,
+  "exp": "الشرط الخارجي a > 3 صحيح فندخل جواه. الشرط الداخلي b < 5 خطأ لأن b = 9، فبتتنفذ else الداخلية وبتطبع Y. else الخارجية مش بتتنفذ."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "total = 0\nfor i in range(2, 10, 3):\n    total += i\nprint(total)",
+  "mono": true,
+  "options": [
+   "21",
+   "7",
+   "15",
+   "10"
+  ],
+  "correct": 2,
+  "exp": "range(2, 10, 3) بتبدأ من 2 وبتزيد 3 كل مرة وبتقف قبل 10، فالقيم: 2 و 5 و 8. المجموع = 15."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "n = 5\ncount = 0\nwhile n &gt; 0:\n    n -= 2\n    count += 1\nprint(n, count)",
+  "mono": true,
+  "options": [
+   "-1 3",
+   "1 2",
+   "0 3",
+   "-1 2"
+  ],
+  "correct": 0,
+  "exp": "قيم n: 5 ثم 3 ثم 1 ثم -1، وكل لفة بتزيد count بواحد (3 لفات). عند n = -1 الشرط n > 0 بيفشل واللوب بتقف. الناتج -1 3."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "for i in range(1, 8):\n    if i % 3 == 0:\n        continue\n    if i == 7:\n        break\n    print(i, end=\" \")",
+  "mono": true,
+  "options": [
+   "1 2 4 5 6",
+   "1 2 3 4 5 6",
+   "1 2 4 5 7",
+   "1 2 4 5"
+  ],
+  "correct": 3,
+  "exp": "لما i = 3 أو 6 بتشتغل continue فبتتخطى الطباعة. ولما i = 7 بتشتغل break قبل الطباعة وبتخرج من اللوب. فالمطبوع 1 2 4 5."
+ },
+ {
+  "q": "What is the purpose of the <code>pass</code> statement in Python?",
+  "code": "",
+  "mono": false,
+  "options": [
+   "It exits the loop immediately",
+   "It does nothing; it is a placeholder where a statement is syntactically required",
+   "It skips to the next iteration of the loop",
+   "It raises an error when executed"
+  ],
+  "correct": 1,
+  "exp": "الأمر pass مبيعملش حاجة، بنستخدمه كـ placeholder لما Python تطلب statement في block (مثل if أو loop أو function) وإحنا لسه مكتبناش الكود. break هي اللي بتخرج من اللوب، وcontinue هي اللي بتروح للدورة التالية."
+ },
+ {
+  "q": "Which statement about Python is TRUE?",
+  "code": "",
+  "mono": false,
+  "options": [
+   "Variables must be declared with a fixed data type before use",
+   "Python is an interpreted, dynamically typed, high-level language",
+   "Python programs can only run on Windows",
+   "Python requires a separate compilation step to machine code before every run"
+  ],
+  "correct": 1,
+  "exp": "Python لغة interpreted و dynamically typed و high-level: مش لازم تحدد نوع المتغير قبل استخدامه، وبتشتغل على أنظمة تشغيل كتير، ومتحتاجش خطوة compile منفصلة يدوية قبل كل تشغيل."
+ },
+ {
+  "q": "What happens when the following code is executed?",
+  "code": "print(int(\"12.5\"))",
+  "mono": false,
+  "options": [
+   "It prints 12",
+   "It prints 13",
+   "It raises a ValueError",
+   "It prints 12.5"
+  ],
+  "correct": 2,
+  "exp": "الدالة int() مبتقدرش تحوّل string فيها نقطة عشرية مباشرة، فبيحصل ValueError. الصح إننا نحوّلها لـ float الأول: int(float(\"12.5\")) = 12."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "a = 10\na += 5\na //= 2\na **= 2\nprint(a)",
+  "mono": true,
+  "options": [
+   "49",
+   "56.25",
+   "64",
+   "36"
+  ],
+  "correct": 0,
+  "exp": "الخطوات: a = 10، بعدها a += 5 تبقى 15، بعدها a //= 2 تبقى 7، بعدها a **= 2 تبقى 49."
+ },
+ {
+  "q": "What is the output of the following code?",
+  "code": "print(True + True + 1)",
+  "mono": true,
+  "options": [
+   "True",
+   "2",
+   "TypeError",
+   "3"
+  ],
+  "correct": 3,
+  "exp": "في Python النوع bool هو نوع فرعي من int، فـ True قيمتها 1. إذن True + True + 1 = 1 + 1 + 1 = 3."
+ }
+];
+
+const TOTAL_TIME = 30 * 60;
+let timeLeft = TOTAL_TIME;
+let timerInterval;
+let examStartTimestamp = null;
+let userAnswers = new Array(questions.length).fill(null);
+let currentQ = 0;
+let submitted = false;
+let studentName = "";
+
+function questionBody(item){
+  return `<div class="q-text">${item.q}</div>` + (item.code ? `<pre class="code">${item.code}</pre>` : '');
+}
+
+function renderQuestion(idx){
+  const area = document.getElementById('quiz-area');
+  const item = questions[idx];
+  area.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = 'card-' + idx;
+
+  let optionsHtml = '';
+  item.options.forEach((opt, oIdx) => {
+    const sel = userAnswers[idx] === oIdx ? ' selected' : '';
+    optionsHtml += `
+      <label class="option${sel}${item.mono ? ' mono' : ''}" data-o="${oIdx}">
+        <input type="radio" name="q${idx}" value="${oIdx}" ${userAnswers[idx] === oIdx ? 'checked' : ''}>
+        <span>${opt}</span>
+      </label>`;
+  });
+
+  card.innerHTML = `
+    <div><span class="q-number">Question ${idx+1} / ${questions.length}</span></div>
+    ${questionBody(item)}
+    <div class="options">${optionsHtml}</div>`;
+  area.appendChild(card);
+
+  card.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', function(){
+      userAnswers[idx] = parseInt(this.dataset.o);
+      card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      this.querySelector('input').checked = true;
+      card.classList.remove('unanswered');
+      document.getElementById('not-answered-warning').style.display = 'none';
+    });
+  });
+
+  renderNavBar(idx);
+  updateProgress(idx);
+  document.getElementById('not-answered-warning').style.display = 'none';
+}
+
+function renderNavBar(idx){
+  const area = document.getElementById('quiz-area');
+  const navBar = document.createElement('div');
+  navBar.className = 'nav-bar';
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'btn-secondary';
+  backBtn.textContent = '⟵ Previous';
+  backBtn.disabled = idx === 0;
+  backBtn.addEventListener('click', () => {
+    if(currentQ > 0){ currentQ--; renderQuestion(currentQ); window.scrollTo({top:0, behavior:'smooth'}); }
+  });
+
+  const nextBtn = document.createElement('button');
+  const isLast = idx === questions.length - 1;
+  nextBtn.className = isLast ? 'btn-finish' : '';
+  nextBtn.textContent = isLast ? 'Finish & Submit ✔' : 'Next ⟶';
+  nextBtn.addEventListener('click', () => {
+    if(userAnswers[idx] === null){
+      document.getElementById('not-answered-warning').style.display = 'block';
+      document.getElementById('card-' + idx).classList.add('unanswered');
+      return;
+    }
+    if(isLast){ finishExam(false); }
+    else { currentQ++; renderQuestion(currentQ); window.scrollTo({top:0, behavior:'smooth'}); }
+  });
+
+  navBar.appendChild(backBtn);
+  navBar.appendChild(nextBtn);
+  area.appendChild(navBar);
+}
+
+function updateProgress(idx){
+  document.getElementById('progress-bar').style.width = (((idx+1) / questions.length) * 100) + '%';
+  document.getElementById('progress-label').textContent = `Question ${idx+1} of ${questions.length}`;
+}
+
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} }
+}
+function playTick(freq, duration){
+  if(!audioCtx) return;
+  try{
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }catch(e){}
+}
+
+function formatTime(sec){
+  return Math.floor(sec/60).toString().padStart(2,'0') + ':' + (sec%60).toString().padStart(2,'0');
+}
+
+function startTimer(){
+  const timerEl = document.getElementById('timer');
+  examStartTimestamp = Date.now();
+  function tick(){
+    if(submitted) return;
+    const elapsed = Math.floor((Date.now() - examStartTimestamp) / 1000);
+    timeLeft = Math.max(0, TOTAL_TIME - elapsed);
+    timerEl.textContent = formatTime(timeLeft);
+    if(timeLeft <= 60 && timeLeft > 0){
+      timerEl.classList.add('warn');
+      playTick(500 + (60 - timeLeft) * 10, timeLeft <= 10 ? 0.18 : 0.1);
+    }
+    if(timeLeft <= 0){ clearInterval(timerInterval); finishExam(true); }
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible' && !submitted && examStartTimestamp !== null) tick();
+  });
+}
+
+let finalScore = 0, finalTotal = 0, finalPct = 0, wrongQuestionNumbers = [], examDurationText = '';
+
+function finishExam(autoSubmit){
+  if(submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('not-answered-warning').style.display = 'none';
+
+  let score = 0;
+  wrongQuestionNumbers = [];
+  const reviewArea = document.getElementById('review-area');
+  reviewArea.innerHTML = '';
+
+  const elapsedSec = examStartTimestamp !== null ? Math.floor((Date.now() - examStartTimestamp) / 1000) : (TOTAL_TIME - timeLeft);
+  examDurationText = formatTime(Math.min(elapsedSec, TOTAL_TIME));
+
+  questions.forEach((item, idx) => {
+    const userA = userAnswers[idx];
+    const isCorrect = userA === item.correct;
+    if(isCorrect) score++; else wrongQuestionNumbers.push(idx+1);
+    const userText = (userA === null) ? 'Not answered' : item.options[userA];
+    const monoCls = item.mono ? ' style="font-family:Consolas,\'Courier New\',monospace;"' : '';
+    let answerHtml = isCorrect
+      ? `<div class="answer-line correct"${monoCls}>Answer: ${userText} ✓ Correct</div>`
+      : `<div class="answer-line wrong"${monoCls}>Student answer: ${userText} ✗</div>
+         <div class="answer-line correct"${monoCls}>Correct answer: ${item.options[item.correct]}</div>`;
+    const div = document.createElement('div');
+    div.className = 'card review-item' + (isCorrect ? '' : ' wrong');
+    div.innerHTML = `<div><span class="q-number">Question ${idx+1}</span></div>${questionBody(item)}${answerHtml}${isCorrect ? '' : `<div class="exp"><b>💡 شرح الإجابة</b>${item.exp}</div>`}`;
+    reviewArea.appendChild(div);
+  });
+
+  finalScore = score;
+  finalTotal = questions.length;
+  finalPct = Math.round((score/finalTotal)*100);
+  document.getElementById('score-num').textContent = finalScore + ' / ' + finalTotal;
+
+  let msg = '', bigEmoji = '';
+  if(finalPct >= 90){ msg = 'Excellent! Outstanding performance'; bigEmoji = '🏆'; }
+  else if(finalPct >= 75){ msg = 'Very good, keep studying'; bigEmoji = '😄'; }
+  else if(finalPct >= 50){ msg = 'Good, but more revision is needed'; bigEmoji = '🙂'; }
+  else { msg = 'Please review the lessons from the beginning'; bigEmoji = '😕'; }
+  document.getElementById('score-emoji').textContent = bigEmoji;
+
+  const dateStr = new Date().toLocaleDateString('en-GB');
+  document.getElementById('score-msg').innerHTML =
+    `Name: <strong>${studentName}</strong><br>Date: ${dateStr}<br>Time taken: <strong>${examDurationText}</strong> out of 30:00<br>
+     Score: ${finalPct}% — ${msg}${autoSubmit ? '<br><strong style="color:var(--wrong);">The exam was submitted automatically because time ran out.</strong>' : ''}`;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'none';
+  document.getElementById('progress-label').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'auto'});
+  autoDeliverReport();
+}
+
+async function autoDeliverReport(){
+  const statusEl = document.getElementById('send-status');
+  try{
+    statusEl.textContent = '⏳ Preparing the PDF report...';
+    const blob = await buildPdfBlob();
+    const fileName = `Report_${(studentName || 'Student').replace(/\s+/g,'_')}.pdf`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    statusEl.textContent = '✅ PDF downloaded. Opening WhatsApp...';
+    const waUrl = `https://wa.me/${TEACHER_PHONE}?text=${encodeURIComponent(buildWhatsAppSummaryText())}`;
+    setTimeout(() => window.open(waUrl, '_blank'), 300);
+    setTimeout(() => { statusEl.textContent = '✅ PDF downloaded and WhatsApp opened.'; }, 500);
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = '⚠️ Could not download the PDF automatically. Use the send button below.';
+  }
+}
+
+function buildWhatsAppSummaryText(){
+  const dateStr = new Date().toLocaleDateString('en-GB');
+  const divider = '----------------------';
+  let lines = [];
+  lines.push(`*Exam Report: ${EXAM_TITLE}*`);
+  lines.push('*Prepared by Eng. Marco Edwer*');
+  lines.push(divider);
+  lines.push(`*Name:* ${studentName}`);
+  lines.push(`*Date:* ${dateStr}`);
+  lines.push(`*Time taken:* ${examDurationText} out of 30:00`);
+  lines.push(`*Score:* ${finalScore} / ${finalTotal}  (${finalPct}%)`);
+  lines.push(wrongQuestionNumbers.length ? `*Wrong questions:* ${wrongQuestionNumbers.join(', ')}` : '*No wrong answers*');
+  lines.push(divider);
+  lines.push('The full answer details are attached in the PDF report.');
+  return lines.join('\n');
+}
+
+async function buildPdfBlob(){
+  const source = document.getElementById('report-content');
+  const clone = source.cloneNode(true);
+  const wrapper = document.getElementById('pdf-report');
+  wrapper.innerHTML = '';
+  wrapper.appendChild(clone);
+  const canvas = await html2canvas(wrapper, {scale:2, backgroundColor:'#ffffff', useCORS:true});
+  const imgData = canvas.toDataURL('image/jpeg', 0.92);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = 210, pageHeight = 297;
+  const imgHeight = (canvas.height * pageWidth) / canvas.width;
+  let heightLeft = imgHeight, position = 0;
+  pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
+  heightLeft -= pageHeight;
+  while(heightLeft > 0){
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+  wrapper.innerHTML = '';
+  return pdf.output('blob');
+}
+
+document.getElementById('send-wa-btn').addEventListener('click', async function(){
+  const statusEl = document.getElementById('send-status');
+  const btn = this;
+  btn.disabled = true;
+  statusEl.textContent = '⏳ Preparing the PDF report...';
+  try{
+    const blob = await buildPdfBlob();
+    const fileName = `Report_${studentName.replace(/\s+/g,'_')}.pdf`;
+    const file = new File([blob], fileName, {type:'application/pdf'});
+    const summaryText = buildWhatsAppSummaryText();
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      statusEl.textContent = '📤 Choose WhatsApp from the share menu to send the report...';
+      await navigator.share({files:[file], title:'Exam Report', text: summaryText});
+      statusEl.textContent = '✅ Share menu opened';
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fileName;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      const waText = summaryText + '\n\nThe PDF report was saved on your device. Please attach it to this chat.';
+      window.open(`https://wa.me/${TEACHER_PHONE}?text=${encodeURIComponent(waText)}`, '_blank');
+      statusEl.textContent = 'PDF downloaded and WhatsApp opened. If the file is not attached automatically, attach it manually.';
+    }
+  }catch(err){
+    statusEl.textContent = (err && err.name === 'AbortError') ? 'Sharing was cancelled.' : 'An error occurred while preparing the report. Please try again.';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  const nameInput = document.getElementById('student-name');
+  const name = nameInput.value.trim();
+  if(name === ''){
+    document.getElementById('name-warning').style.display = 'block';
+    nameInput.focus();
+    return;
+  }
+  studentName = name;
+  initAudio();
+  document.getElementById('start-screen').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'block';
+  document.getElementById('progress-label').style.display = 'block';
+  renderQuestion(currentQ);
+  startTimer();
+  window.scrollTo({top:0, behavior:'auto'});
+});
+</script>
+</body>
+</html>
