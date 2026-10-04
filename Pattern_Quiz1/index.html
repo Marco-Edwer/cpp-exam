@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Python Basics Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -451,13 +454,17 @@
   }
 
 
+:root{--mono:'JetBrains Mono',ui-monospace,'Roboto Mono','Droid Sans Mono',Menlo,Consolas,monospace;}
 .exp{direction:rtl;text-align:right;background:#fffbe6;border:1px solid #ffe08a;border-radius:10px;padding:12px 14px;margin-top:10px;line-height:1.9;font-size:0.95rem;color:#5c4400;}
 .exp b{display:block;margin-bottom:4px;}
 .code{direction:ltr;text-align:left;background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;
-  font-family:Consolas,'Courier New',monospace;white-space:pre;overflow-x:auto;font-size:0.95rem;line-height:1.65;margin:0 0 18px;tab-size:4;}
-.option.mono span{font-family:Consolas,'Courier New',monospace;}
+  font-family:'JetBrains Mono',ui-monospace,'Roboto Mono','Droid Sans Mono',Menlo,Consolas,monospace;white-space:pre;font-weight:500;overflow-x:auto;font-size:0.95rem;line-height:1.65;margin:0 0 18px;tab-size:4;}
+.option.mono span{font-family:'JetBrains Mono',ui-monospace,'Roboto Mono','Droid Sans Mono',Menlo,Consolas,monospace;font-weight:500;font-size:0.98em;}
+code{font-family:'JetBrains Mono',ui-monospace,'Roboto Mono',monospace;background:#e8eef7;padding:1px 6px;border-radius:5px;font-size:0.92em;}
 .q-text{font-family:inherit;}
-body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;}
+body,button,input{font-family:'Inter','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif !important;}
+.q-text{font-weight:600;letter-spacing:-0.1px;}
+.exp, .exp *{font-family:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif !important;}
 .header{flex-direction:row-reverse;}
 @media (max-width:600px){
   .header{flex-direction:row-reverse !important;align-items:center !important;justify-content:space-between !important;padding:8px 12px !important;gap:8px !important;flex-wrap:nowrap !important;}
@@ -467,12 +474,17 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;}
   #timer{align-self:center !important;min-width:78px !important;padding:6px 10px !important;font-size:1.1rem !important;}
   .progress-label{padding:4px 10px !important;font-size:0.8rem !important;}
   #quiz-area{display:flex !important;flex-direction:column !important;min-height:calc(100vh - 112px) !important;min-height:calc(100dvh - 112px) !important;}
+  #quiz-area[style*="display: none"]{display:none !important;}
   #quiz-area .card{min-height:0 !important;flex:1 1 auto !important;padding:12px 12px !important;}
   #quiz-area .q-number{display:none !important;}
-  #quiz-area .q-text{font-size:1.05rem !important;line-height:1.6 !important;margin:2px 0 12px !important;}
-  .code{font-size:0.88rem !important;padding:10px 12px !important;margin-bottom:12px !important;line-height:1.55 !important;}
-  #quiz-area .option{padding:10px 12px !important;margin-bottom:0 !important;font-size:0.95rem !important;line-height:1.5 !important;}
+  #quiz-area .q-text{font-size:1.1rem !important;line-height:1.6 !important;margin:2px 0 12px !important;}
+  .code{font-size:0.92rem !important;padding:10px 12px !important;margin-bottom:12px !important;line-height:1.55 !important;}
+  #quiz-area .option{padding:10px 12px !important;margin-bottom:0 !important;font-size:1rem !important;line-height:1.5 !important;}
   #quiz-area .options{gap:8px !important;}
+  #start-screen{min-height:0 !important;justify-content:flex-start !important;padding:28px 16px !important;margin:0 !important;}
+  #start-screen h2{font-size:1.25rem !important;margin-bottom:6px !important;}
+  #start-btn{flex:0 0 auto !important;width:100% !important;min-height:0 !important;height:auto !important;padding:14px 10px !important;font-size:1.05rem !important;margin-top:6px;}
+  #start-screen input{margin:12px 0 !important;}
   #quiz-area .nav-bar{position:sticky;bottom:0;background:#fff;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px)) !important;border-top:1px solid var(--border);margin-top:0 !important;z-index:5;}
 }
 </style>
@@ -952,7 +964,7 @@ function finishExam(autoSubmit){
     const isCorrect = userA === item.correct;
     if(isCorrect) score++; else wrongQuestionNumbers.push(idx+1);
     const userText = (userA === null) ? 'Not answered' : item.options[userA];
-    const monoCls = item.mono ? ' style="font-family:Consolas,\'Courier New\',monospace;"' : '';
+    const monoCls = item.mono ? ' style="font-family:var(--mono);font-size:0.92rem;"' : '';
     let answerHtml = isCorrect
       ? `<div class="answer-line correct"${monoCls}>Answer: ${userText} ✓ Correct</div>`
       : `<div class="answer-line wrong"${monoCls}>Student answer: ${userText} ✗</div>
